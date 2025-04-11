@@ -1,0 +1,182 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "first_name": "Carlos",
+      "last_name": "Gómez",
+      "email": "carlos.gomez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "first_name": "Laura",
+      "last_name": "Martínez",
+      "email": "laura.martinez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "first_name": "Andrés",
+      "last_name": "Hernández",
+      "email": "andres.hernandez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "first_name": "Isabel",
+      "last_name": "Díaz",
+      "email": "isabel.diaz@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "first_name": "Javier",
+      "last_name": "Sánchez",
+      "email": "javier.sanchez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 6,
+    "fields": {
+      "first_name": "Marta",
+      "last_name": "Romero",
+      "email": "marta.romero@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 7,
+    "fields": {
+      "first_name": "Ricardo",
+      "last_name": "Fernández",
+      "email": "ricardo.fernandez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 8,
+    "fields": {
+      "first_name": "Patricia",
+      "last_name": "Torres",
+      "email": "patricia.torres@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 9,
+    "fields": {
+      "first_name": "Alejandro",
+      "last_name": "Jiménez",
+      "email": "alejandro.jimenez@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 10,
+    "fields": {
+      "first_name": "Sofía",
+      "last_name": "Ruiz",
+      "email": "sofia.ruiz@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 11,
+    "fields": {
+      "first_name": "Diego",
+      "last_name": "García",
+      "email": "diego.garcia@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 12,
+    "fields": {
+      "first_name": "Elena",
+      "last_name": "Vargas",
+      "email": "elena.vargas@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 13,
+    "fields": {
+      "first_name": "Gabriel",
+      "last_name": "Molina",
+      "email": "gabriel.molina@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 14,
+    "fields": {
+      "first_name": "Lucía",
+      "last_name": "Santos",
+      "email": "lucia.santos@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 15,
+    "fields": {
+      "first_name": "Hugo",
+      "last_name": "Ortega",
+      "email": "hugo.ortega@example.com",
+      "password": "hashed_password_here",
+      "created_at": "2025-04-10T12:00:00Z",
+      "updated_at": "2025-04-10T12:00:00Z"
+    }
+  }
+]

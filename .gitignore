@@ -1,0 +1,82 @@
+# Entornos virtuales y entornos Python
+venv/
+ENV/
+env/
+.venv/
+.env
+*.pyc
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Docker
+docker-compose.override.yml
+docker-compose.yml.version
+.dockerignore
+docker-data/
+**/db-data/
+
+# Archivos de IDE/Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+
+# Archivos del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs y directorios de pruebas
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+test-results/
+coverage/
+
+# Archivos de desarrollo local
+local_settings.py
+instance/
+.webassets-cache
+
+# Archivos de compilación y paquetes
+dist/
+build/
+*.mo
+*.pot
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints
+
+# Archivos de Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Archivos de node_modules (si usas frontend)
+node_modules/
