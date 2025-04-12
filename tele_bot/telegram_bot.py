@@ -168,7 +168,8 @@ class AdminTelegramBot:
 
         else:
             return (
-                '<b>💡 Comandos disponibles:</b>\n'
+                'No he entendido ese comando\n'
+                '<b>💡 Aquí tienes los comandos disponibles:</b>\n'
                 '/reservas - Todas las reservas futuras\n'
                 '/reservas-hoy - Reservas restantes de hoy\n'
                 '/barbero [nombre] - Citas de un barbero\n'

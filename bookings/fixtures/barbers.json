@@ -148,5 +148,15 @@
       "email": "oscar.castro@example.com",
       "phone_number": "555159357"
     }
+  },
+  {
+    "model": "bookings.barber",
+    "pk": 16,
+    "fields": {
+      "first_name": "Jose",
+      "last_name": "Denar",
+      "email": "jose.denar@example.com",
+      "phone_number": "123456889"
+    }
   }
 ]

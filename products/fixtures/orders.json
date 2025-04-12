@@ -1,0 +1,53 @@
+[
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "name": "Laptop Pro",
+      "description": "Potente laptop para profesionales",
+      "price": "999.99",
+      "stock": 10,
+      "image": "product_images/laptop.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "name": "Smartphone X",
+      "description": "Último modelo con 5G",
+      "price": "599.99",
+      "stock": 20,
+      "image": "product_images/phone.jpg"
+    }
+  },
+  {
+    "model": "products.cartitem",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "product": 1,
+      "quantity": 2
+    }
+  },
+  {
+    "model": "products.cartitem",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "product": 2,
+      "quantity": 1
+    }
+  },
+  {
+    "model": "products.order",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "items": [1, 2],
+      "total_price": "2599.97",
+      "created_at": "2023-10-15T12:00:00Z",
+      "status": "completed"
+    }
+  }
+]

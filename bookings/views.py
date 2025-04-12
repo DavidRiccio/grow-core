@@ -44,15 +44,15 @@ def create_booking(request):
 
 def service_list(request):
     services = Service.objects.all()
-    serializer = ServiceSerializer(services, request=request, many=True)
-    return JsonResponse(serializer.serialize(), safe=False)
+    serializer = ServiceSerializer(services, request=request)
+    return serializer.json_response()
 
 
 def service_detail(request, service_id):
     try:
         service = Service.objects.get(id=service_id)
         serializer = ServiceSerializer(service, request=request)
-        return JsonResponse(serializer.serialize(), safe=False)
+        return serializer.json_response()
     except Service.DoesNotExist:
         return JsonResponse({'error': 'Service not found'}, status=404)
 
@@ -60,13 +60,13 @@ def service_detail(request, service_id):
 def booking_detail(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
     serializer = BookingSerializer(booking, request=request)
-    return JsonResponse(serializer.serialize(), safe=False)
+    return serializer.json_response()
 
 
 def barber_list(request):
     barbers = Barber.objects.all()
     serializer = BarberSerializer(barbers, request=request)
-    return JsonResponse(serializer.serialize(), safe=False)
+    return serializer.json_response()
 
 
 # Vista para obtener los detalles de un barbero específico
@@ -74,6 +74,6 @@ def barber_detail(request, barber_id):
     try:
         barber = Barber.objects.get(id=barber_id)
         serializer = BarberSerializer(barber, request=request)
-        return JsonResponse(serializer.serialize(), safe=False)
+        return serializer.json_response()
     except Barber.DoesNotExist:
         return JsonResponse({'error': 'Barber not found'}, status=404)

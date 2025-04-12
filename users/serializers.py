@@ -9,7 +9,6 @@ class UserSerializer(BaseSerializer):
             'last_name': instance.last_name,
             'email': instance.email,
             'phone_number': instance.phone_number,
-            'address': instance.address,
             'created_at': instance.created_at,
             'updated_at': instance.updated_at,
         }
