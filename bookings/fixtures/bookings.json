@@ -5,7 +5,6 @@
     "fields": {
       "user": 1,
       "service": 1,
-      "barber": 1,
       "date": "2025-05-15",
       "time": "10:00:00",
       "status": "confirmed",
@@ -18,7 +17,6 @@
     "fields": {
       "user": 2,
       "service": 2,
-      "barber": 2,
       "date": "2025-05-16",
       "time": "16:30:00",
       "status": "pending",
@@ -31,7 +29,6 @@
     "fields": {
       "user": 3,
       "service": 3,
-      "barber": 3,
       "date": "2025-05-17",
       "time": "12:15:00",
       "status": "confirmed",
@@ -44,7 +41,6 @@
     "fields": {
       "user": 4,
       "service": 1,
-      "barber": 2,
       "date": "2025-05-18",
       "time": "17:45:00",
       "status": "cancelled",
@@ -57,7 +53,6 @@
     "fields": {
       "user": 5,
       "service": 2,
-      "barber": 1,
       "date": "2025-05-19",
       "time": "11:00:00",
       "status": "confirmed",
@@ -70,7 +65,6 @@
     "fields": {
       "user": 6,
       "service": 3,
-      "barber": 3,
       "date": "2025-05-20",
       "time": "15:30:00",
       "status": "pending",
@@ -83,7 +77,6 @@
     "fields": {
       "user": 7,
       "service": 1,
-      "barber": 2,
       "date": "2025-05-21",
       "time": "09:45:00",
       "status": "confirmed",
@@ -96,7 +89,6 @@
     "fields": {
       "user": 8,
       "service": 2,
-      "barber": 1,
       "date": "2025-05-22",
       "time": "14:15:00",
       "status": "pending",
@@ -109,7 +101,6 @@
     "fields": {
       "user": 9,
       "service": 3,
-      "barber": 3,
       "date": "2025-05-23",
       "time": "18:00:00",
       "status": "confirmed",
@@ -122,7 +113,6 @@
     "fields": {
       "user": 10,
       "service": 1,
-      "barber": 2,
       "date": "2025-05-24",
       "time": "13:00:00",
       "status": "cancelled",
@@ -135,7 +125,6 @@
     "fields": {
       "user": 11,
       "service": 2,
-      "barber": 1,
       "date": "2025-05-25",
       "time": "10:30:00",
       "status": "confirmed",
@@ -148,7 +137,6 @@
     "fields": {
       "user": 12,
       "service": 3,
-      "barber": 3,
       "date": "2025-05-26",
       "time": "16:45:00",
       "status": "pending",
@@ -161,7 +149,6 @@
     "fields": {
       "user": 13,
       "service": 1,
-      "barber": 2,
       "date": "2025-05-27",
       "time": "12:00:00",
       "status": "confirmed",
@@ -174,7 +161,6 @@
     "fields": {
       "user": 14,
       "service": 2,
-      "barber": 1,
       "date": "2025-05-28",
       "time": "15:00:00",
       "status": "pending",
@@ -187,7 +173,6 @@
     "fields": {
       "user": 15,
       "service": 3,
-      "barber": 3,
       "date": "2025-05-29",
       "time": "19:30:00",
       "status": "confirmed",

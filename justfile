@@ -1,41 +1,41 @@
-project := file_stem(justfile_dir())
+project := file_stem(justfile_directory())
 venv-name := ".venv"
-venv-path := join(justfile_dir(), venv-name)
-pip-cmd := shell('if [ -x "$(command -v uv)" ]; then echo "uv pip"; else echo "pip"; fi')
+venv-path := join(justfile_directory(), venv-name)
+
 
 # ==============================================================================
 # DJANGO RECIPES
 # ==============================================================================
 
 # Launch development server
-runserver: check-venv kill-runservers
+runserver: kill-runservers
     ./manage.py runserver
 
 # Launch Django interactive shell
-sh: check-venv
+sh:
     ./manage.py shell
 
 alias mm := makemigrations
 # Make Django migrations
-makemigrations: check-venv
+makemigrations:
     ./manage.py makemigrations
     
 alias m := migrate
 # Apply Django migrations
-migrate: check-venv
+migrate:
     ./manage.py migrate
 
 alias c := check
 # Check if Django project is correct
-check: check-venv
+check:
     ./manage.py check
 
 # Add a new app and install it on settings.py
-startapp app: check-venv
+startapp app:
     #!/usr/bin/env bash
     python manage.py startapp {{ app }}
     APP_CLASS={{ app }}
-    APP_CONFIG="{{ app }}.apps.${APP_CLASS^}Config"
+    APP_CONFIG="apps.{{ app }}.apps.${APP_CLASS^}Config"
     perl -0pi -e "s/(INSTALLED_APPS *= *\[)(.*?)(\])/\1\2    '$APP_CONFIG',\n\3/smg" ./main/settings.py
     echo "✔ {{ app }} installed & added to settings.INSTALLED_APPS"
 
@@ -44,42 +44,13 @@ startapp app: check-venv
 # ==============================================================================
 
 # Create a Python virtualenv
-create-venv:
-    #!/usr/bin/env bash
-    if [ ! -d {{ venv-name }} ]
-    then
-        if [ -x "$(command -v uv)" ]
-        then
-            uv venv --seed
-        else
-            python -m venv {{ venv-name }} --prompt {{ project }}
-        fi
-    fi
-
-# Check if Python virtualenv is activated
-[private]
-[no-exit-message]
-check-venv: create-venv
-    #!/usr/bin/env bash
-    if [ "$VIRTUAL_ENV" != "{{ venv-path }}" ]; then
-        echo Project virtualenv: {{ venv-path }}
-        echo Active virtualenv: $VIRTUAL_ENV
-        echo
-        echo You must activate the right virtualenv!
-        exit 1
-    fi
-
-alias i := install-reqs
-# Install project requirements
-install-reqs: check-venv
-    {{ pip-cmd }} install -r requirements.txt
 
 # ==============================================================================
 # DJANGO AUX RECIPES
 # ==============================================================================
 
 # Setup a Django project
-setup: install-reqs && migrate create-su
+setup: migrate create-su
     #!/usr/bin/env bash
     django-admin startproject main .
     sed -i -E "s/(TIME_ZONE).*/\1 = 'Atlantic\/Canary'/" ./main/settings.py
@@ -102,7 +73,7 @@ create-su username="admin" password="admin" email="admin@example.com":
 # https://medium.com/@mustahibmajgaonkar/how-to-reset-django-migrations-6787b2a1e723
 # https://stackoverflow.com/a/76300128
 # Remove migrations and database. Reset DB artefacts.
-[confirm("⚠️ All migrations and database will be removed. Continue? [yN]:")]
+[confirm]
 reset-db: && create-su
     #!/usr/bin/env bash
     find . -path "*/migrations/*.py" ! -path "./.venv/*" ! -name "__init__.py" -delete
@@ -113,12 +84,12 @@ reset-db: && create-su
     echo
 
 # Launch worker for Redis Queue (RQ)
-rq: check-venv redis
+rq: redis
     watchmedo auto-restart --pattern=tasks.py --recursive -- ./manage.py rqworker
 
 # Generate fake data and populate Django database
 [private]
-@gen-data *args: check-venv clean-data
+@gen-data *args: clean-data
     #!/usr/bin/env bash
     ./manage.py gen_data {{ args }}
 
@@ -128,7 +99,7 @@ dump-data: gen-data
     #!/usr/bin/env bash
     mkdir -p fixtures
     ./manage.py dumpdata --format json --indent 2 auth.User -o fixtures/auth.json
-    for model in users teams players; do
+    for model in users categories platforms games orders; do
         ./manage.py dumpdata --format json --indent 2 $model -o fixtures/$model.json
     done
 
@@ -136,7 +107,7 @@ dump-data: gen-data
 [private]
 clean-data:
     #!/usr/bin/env bash
-    for table in teams_team players_player users_token; do
+    for table in categories_category games_game games_review orders_order platforms_platform users_token; do
         sqlite3 db.sqlite3 "DELETE FROM $table; UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='$table';"
     done
     sqlite3 db.sqlite3 "DELETE FROM auth_user WHERE is_superuser=0; UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='auth_user';"
@@ -152,9 +123,9 @@ show-users:
     ' 
 
 # Load fixtures into database
-load-data: check-venv clean-data
+load-data: clean-data
     #!/usr/bin/env bash
-    for model in auth users teams players; do
+    for model in auth users categories platforms games orders; do
         ./manage.py loaddata fixtures/$model.json
     done
     echo ---------------------------

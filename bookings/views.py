@@ -7,8 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from users.models import User
 
-from .models import Barber, Booking, Service
-from .serializers import BarberSerializer, BookingSerializer, ServiceSerializer
+from .models import Booking, Service
+from .serializers import BookingSerializer, ServiceSerializer
 
 
 def booking_list(request):
@@ -61,19 +61,3 @@ def booking_detail(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
     serializer = BookingSerializer(booking, request=request)
     return serializer.json_response()
-
-
-def barber_list(request):
-    barbers = Barber.objects.all()
-    serializer = BarberSerializer(barbers, request=request)
-    return serializer.json_response()
-
-
-# Vista para obtener los detalles de un barbero específico
-def barber_detail(request, barber_id):
-    try:
-        barber = Barber.objects.get(id=barber_id)
-        serializer = BarberSerializer(barber, request=request)
-        return serializer.json_response()
-    except Barber.DoesNotExist:
-        return JsonResponse({'error': 'Barber not found'}, status=404)

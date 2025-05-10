@@ -25,7 +25,6 @@ def enviar_reserva_telegram(sender, instance, created, **kwargs):
             mensaje = 'Se ha realizado una nueva reserva:\n\n'
             mensaje += f'Usuario: {instance.user.first_name} {instance.user.last_name} ({instance.user.email})\n'
             mensaje += f'Servicio: {instance.service.name} - {instance.service.price} EUR\n'
-            mensaje += f'Barbero: {instance.barber.first_name} {instance.barber.last_name}\n'
             mensaje += f'Fecha: {instance.date} | Hora: {instance.time}\n'
             mensaje += f'Estado: {instance.status}\n'
 

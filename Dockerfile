@@ -1,20 +1,17 @@
-FROM python:3.10-slim-buster
+# Usa la imagen base de Python
+FROM python:3.11
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
-
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libjpeg-dev \
-    zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
-
+# Establece el directorio de trabajo
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copia los archivos de la aplicación al contenedor
+COPY . /app/
 
-COPY . .
+# Instala las dependencias
+RUN pip install -r requirements.txt
 
-# No necesitamos collectstatic para desarrollo
-# CMD se manejará desde docker-compose
+# Expón el puerto 8000
+EXPOSE 8000
+
+# Ejecuta el servidor de desarrollo de Django
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
