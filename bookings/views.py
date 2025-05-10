@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from users.models import User
 
 from .models import Booking, Service
-from .serializers import BookingSerializer, ServiceSerializer
+from .serializers import BookingSerializer
 
 
 def booking_list(request):
@@ -40,21 +40,6 @@ def create_booking(request):
         return JsonResponse(booking_serializer.serialize(), status=201)
 
     return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
-
-
-def service_list(request):
-    services = Service.objects.all()
-    serializer = ServiceSerializer(services, request=request)
-    return serializer.json_response()
-
-
-def service_detail(request, service_id):
-    try:
-        service = Service.objects.get(id=service_id)
-        serializer = ServiceSerializer(service, request=request)
-        return serializer.json_response()
-    except Service.DoesNotExist:
-        return JsonResponse({'error': 'Service not found'}, status=404)
 
 
 def booking_detail(request, booking_id):

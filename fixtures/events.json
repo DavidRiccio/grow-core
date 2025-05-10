@@ -1,0 +1,38 @@
+[
+  {
+    "model": "events.event",
+    "pk": 1,
+    "fields": {
+      "name": "Inauguración Barbería",
+      "description": "Evento de apertura de nuestra nueva barbería.",
+      "date": "2025-06-01",
+      "time": "10:00:00",
+      "location": "Calle Ficticia 123, Ciudad, País",
+      "created_at": "2025-05-10T12:15:00"
+    }
+  },
+  {
+    "model": "events.event",
+    "pk": 2,
+    "fields": {
+      "name": "Noche de Cortes",
+      "description": "Evento especial con cortes de cabello a precios reducidos.",
+      "date": "2025-06-10",
+      "time": "18:00:00",
+      "location": "Calle Ficticia 123, Ciudad, País",
+      "created_at": "2025-05-10T12:20:00"
+    }
+  },
+  {
+    "model": "events.event",
+    "pk": 3,
+    "fields": {
+      "name": "Corte y Afeitado para Padres",
+      "description": "Promoción especial para padres en su día.",
+      "date": "2025-06-19",
+      "time": "09:00:00",
+      "location": "Calle Ficticia 123, Ciudad, País",
+      "created_at": "2025-05-10T12:25:00"
+    }
+  }
+]

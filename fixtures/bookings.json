@@ -1,0 +1,38 @@
+[
+  {
+    "model": "bookings.booking",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "service": 1,
+      "date": "2025-06-01",
+      "time_slot": 1,
+      "status": 2,
+      "created_at": "2025-05-10T12:30:00"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "service": 2,
+      "date": "2025-06-01",
+      "time_slot": 2,
+      "status": 1,
+      "created_at": "2025-05-10T12:35:00"
+    }
+  },
+  {
+    "model": "bookings.booking",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "service": 3,
+      "date": "2025-06-10",
+      "time_slot": 3,
+      "status": 2,
+      "created_at": "2025-05-10T12:40:00"
+    }
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "name": "Shampoo",
+      "description": "Shampoo nutritivo para todo tipo de cabello.",
+      "price": "10.50",
+      "stock": 100,
+      "image": "product_images/shampoo.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "name": "Corte de cabello",
+      "description": "Corte de cabello clásico.",
+      "price": "15.00",
+      "stock": 50,
+      "image": "product_images/corte_cabello.jpg"
+    }
+  },
+  {
+    "model": "products.order",
+    "pk": 1,
+    "fields": {
+      "status": "P",
+      "created_at": "2025-05-10T10:00:00",
+      "updated_at": "2025-05-10T10:05:00",
+      "key": "c8b55656-bbb2-4d97-b850-b33967e551f8",
+      "user": 1,
+      "product": [1, 2]
+    }
+  },
+  {
+    "model": "products.shoppingcartitem",
+    "pk": 1,
+    "fields": {
+      "order": 1,
+      "product": 1,
+      "quantity": 2
+    }
+  },
+  {
+    "model": "products.shoppingcartitem",
+    "pk": 2,
+    "fields": {
+      "order": 1,
+      "product": 2,
+      "quantity": 1
+    }
+  }
+]
