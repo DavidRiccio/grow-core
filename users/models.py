@@ -18,7 +18,7 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.username} ({self.email})'
+        return f'{self.username}'
 
     def save(self, *args, **kwargs):
         if not self.pk:

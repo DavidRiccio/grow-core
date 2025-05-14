@@ -1,6 +1,8 @@
 from services.serializers import ServiceSerializer
 from shared.serializers import BaseSerializer
 
+from .models import Booking
+
 
 class BookingSerializer(BaseSerializer):
     def serialize_instance(self, instance) -> dict:
@@ -23,4 +25,14 @@ class TimeSlotSerializer(BaseSerializer):
             'id': instance.id,
             'start_time': instance.start_time,
             'end_time': instance.end_time,
+        }
+
+
+class BookingEarningsSerializer(BaseSerializer):
+    def serialize_instance(self, instance=None) -> dict:
+        summary = Booking.earnings_summary()
+        return {
+            'daily_earnings': summary['daily'],
+            'weekly_earnings': summary['weekly'],
+            'monthly_earnings': summary['monthly'],
         }

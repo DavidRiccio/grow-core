@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from users.models import User
 
 from .models import Booking, Service
-from .serializers import BookingSerializer
+from .serializers import BookingEarningsSerializer, BookingSerializer
 
 
 def booking_list(request):
@@ -45,4 +45,9 @@ def create_booking(request):
 def booking_detail(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
     serializer = BookingSerializer(booking, request=request)
+    return serializer.json_response()
+
+
+def earnings_summary(request):
+    serializer = BookingEarningsSerializer(None, request=request)
     return serializer.json_response()
