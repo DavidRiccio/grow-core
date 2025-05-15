@@ -1,0 +1,8 @@
+- Hacer tres interfaces para el front (Worker, Admin, Client)
+- Todo lo de las reservas (Interfaz, Vistas)
+- La cola de mensajes (Correo, Whats, Tg)
+- Refactorizar Codigo
+- Lo de Empresas
+- **_DESPLIEGUE_**????????????
+- Graficos de ganancias etc ( Interfaz de Admin )
+- Pasarela de pago

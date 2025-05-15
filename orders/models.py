@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+# Create your models here.
 from products.models import Product
 
 
-# Create your models here.
 class Order(models.Model):
     class Status(models.TextChoices):
         PENDING = 'P', 'Pending'
@@ -46,9 +46,3 @@ class Order(models.Model):
     def add(self, product):
         self.product.add(product)
         self.save()
-
-
-class ShoppingCartItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()

@@ -15,7 +15,7 @@
     "model": "bookings.booking",
     "pk": 2,
     "fields": {
-      "user": 2,
+      "user": 339,
       "service": 2,
       "date": "2025-06-01",
       "time_slot": 2,
@@ -27,7 +27,7 @@
     "model": "bookings.booking",
     "pk": 3,
     "fields": {
-      "user": 3,
+      "user": 340,
       "service": 3,
       "date": "2025-06-10",
       "time_slot": 3,

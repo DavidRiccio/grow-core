@@ -1,9 +1,9 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import Sum
 from django.utils.timezone import now, timedelta
 
 from services.models import Service
-from users.models import User
 
 
 class TimeSlot(models.Model):
@@ -19,7 +19,9 @@ class Booking(models.Model):
         CONFIRMED = 2, 'Confirmed'
         CANCELLED = -1, 'Cancelled'
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bookings'
+    )
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bookings')
     date = models.DateField()
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name='bookings')

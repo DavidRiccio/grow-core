@@ -1,37 +1,32 @@
 import uuid
 
-from django.contrib.auth.hashers import make_password
+from django.conf import settings
 from django.db import models
 
 
-class User(models.Model):
+class Profile(models.Model):
     class Role(models.TextChoices):
         ADMIN = 'A', 'ADMIN'
         WORKER = 'W', 'WORKER'
         CLIENT = 'C', 'CLIENT'
 
-    username = models.CharField(max_length=128, unique=True)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile'
+    )
     role = models.CharField(choices=Role.choices, max_length=1, default=Role.CLIENT)
-    first_name = models.CharField(max_length=50, blank=True, null=True)
-    last_name = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.username}'
-
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.password = make_password(self.password)
-        super().save(*args, **kwargs)
+        return f'{self.user}'
 
 
 class Token(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='token')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='token'
+    )
     key = models.UUIDField(default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f'{self.user}'

@@ -1,13 +1,6 @@
-import json
-from datetime import datetime
-
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 
-from users.models import User
-
-from .models import Booking, Service
+from .models import Booking
 from .serializers import BookingEarningsSerializer, BookingSerializer
 
 
@@ -18,7 +11,7 @@ def booking_list(request):
         return JsonResponse(bookings_serializer, safe=False, status=200)
 
 
-@csrf_exempt
+""" @csrf_exempt
 def create_booking(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -39,7 +32,7 @@ def create_booking(request):
         booking_serializer = BookingSerializer(booking)
         return JsonResponse(booking_serializer.serialize(), status=201)
 
-    return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+    return JsonResponse({'error': 'Only POST method is allowed'}, status=405) """
 
 
 def booking_detail(request, booking_id):
