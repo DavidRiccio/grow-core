@@ -1,4 +1,5 @@
 # Create your views here.
+from .decorators import verify_order
 from .models import Order
 from .serializers import OrderSerializer
 
@@ -8,5 +9,7 @@ def order_list(request):
     return orders.json_response()
 
 
-def order_detail(request, order_pk):
-    pass
+@verify_order
+def order_detail(request, order_pk: int):
+    serializer = OrderSerializer(request.order, request=request)
+    return serializer.json_response()

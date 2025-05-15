@@ -1,3 +1,4 @@
+from products.serializers import ProductSerializer
 from shared.serializers import BaseSerializer
 
 
@@ -16,8 +17,8 @@ class OrderSerializer(BaseSerializer):
         return {
             'id': instance.id,
             'user': instance.user.id,
-            'items': instance.product.id,
-            'total_price': instance.total_price,
+            'items': ProductSerializer(instance.product.all(), request=self.request).serialize(),
+            'total_price': instance.price,
             'created_at': instance.created_at,
             'status': instance.status,
         }
