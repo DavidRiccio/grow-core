@@ -72,6 +72,6 @@ def verify_admin(func):
         if request.user.is_authenticated:
             if request.user.profile.role == 'A':
                 return func(request, *args, **kwargs)
-        return JsonResponse({'error': 'The user must be an admin'})
+        return JsonResponse({'error': 'The user must be an admin'}, status=403)
 
     return wrapper

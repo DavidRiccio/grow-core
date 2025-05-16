@@ -1,6 +1,15 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-from .models import Booking
+from services.models import Service
+from shared.decorators import (
+    load_json_body,
+    required_fields,
+    required_method,
+    verify_token,
+)
+
+from .models import Booking, TimeSlot
 from .serializers import BookingEarningsSerializer, BookingSerializer
 
 
@@ -11,28 +20,23 @@ def booking_list(request):
         return JsonResponse(bookings_serializer, safe=False, status=200)
 
 
-""" @csrf_exempt
+@csrf_exempt
+@required_method('POST')
+@load_json_body
+@required_fields('service', 'time_slot', 'date', model=Booking)
+@verify_token
 def create_booking(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
+    service_pk = request.json_body['service']
+    date = request.json_body['date']
+    time_slot_pk = request.json_body['time_slot']
 
-        user = get_object_or_404(User, pk=data['user'])
-        service = get_object_or_404(Service, pk=data['service'])
-        booking_time = datetime.fromisoformat(data['booking_time'])
-        status = data.get('status', 'pending')
+    service = Service.objects.get(pk=service_pk)
+    time_slot = TimeSlot.objects.get(pk=time_slot_pk)
+    booking = Booking.objects.create(
+        user=request.user, service=service, date=date, time_slot=time_slot
+    )
 
-        booking = Booking.objects.create(
-            user=user,
-            service=service,
-            barber=None,
-            booking_time=booking_time,
-            status=status,
-        )
-
-        booking_serializer = BookingSerializer(booking)
-        return JsonResponse(booking_serializer.serialize(), status=201)
-
-    return JsonResponse({'error': 'Only POST method is allowed'}, status=405) """
+    return JsonResponse({'id': booking.pk})
 
 
 def booking_detail(request, booking_id):
@@ -44,3 +48,31 @@ def booking_detail(request, booking_id):
 def earnings_summary(request):
     serializer = BookingEarningsSerializer(None, request=request)
     return serializer.json_response()
+
+
+@csrf_exempt
+@required_method('POST')
+@load_json_body
+@verify_token
+def edit_booking(request, booking_pk):
+    service_pk = request.json_body['service']
+    date = request.json_body['date']
+    time_slot_pk = request.json_body['time_slot']
+    service = Service.objects.get(pk=service_pk)
+    time_slot = TimeSlot.objects.get(pk=time_slot_pk)
+    booking = Booking.objects.get(pk=booking_pk)
+    booking.service = service
+    booking.date = date
+    booking.time_slot = time_slot
+    booking.save()
+    return JsonResponse({'msg': 'Booking has been edited'})
+
+
+@csrf_exempt
+@required_method('POST')
+@load_json_body
+@verify_token
+def delete_booking(request, booking_pk):
+    booking = Booking.objects.get(pk=booking_pk)
+    booking.delete()
+    return JsonResponse({'msg': 'Event has been deleted'})

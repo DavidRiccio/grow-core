@@ -1,8 +1,5 @@
 from django.db import models
 
-# Create your models here.
-# events/models.py
-
 
 class Event(models.Model):
     name = models.CharField(max_length=100)

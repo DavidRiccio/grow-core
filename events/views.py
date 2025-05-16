@@ -32,7 +32,6 @@ def event_detail(request, event_pk):
 @load_json_body
 @required_fields('name', 'description', 'date', 'time', 'location', model=Event)
 @verify_token
-@verify_admin
 def add_event(request):
     name = request.json_body['name']
     description = request.json_body['description']
