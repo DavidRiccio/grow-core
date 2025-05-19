@@ -11,9 +11,10 @@ from shared.decorators import (
     verify_admin,
     verify_token,
 )
+from users.models import Profile
 
 from .decorators import verify_barber, verify_booking, verify_time_slot
-from .models import Booking
+from .models import Booking, TimeSlot
 from .serializers import BookingEarningsSerializer, BookingSerializer
 
 User = get_user_model()
@@ -27,25 +28,23 @@ def booking_list(request):
     return JsonResponse(bookings_serializer, safe=False, status=200)
 
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 @required_method('POST')
 @load_json_body
 @required_fields('service', 'time_slot', 'date', 'barber', model=Booking)
 @verify_token
-@verify_time_slot
-@verify_barber
 def create_booking(request):
     service_pk = request.json_body['service']
     date = request.json_body['date']
 
     service = Service.objects.get(pk=service_pk)
-    barber = request.barber.pk
-    time_slot = request.time_slot.pk
+    barber = Profile.objects.get(pk=request.json_body['barber'])
+    time_slot = TimeSlot.objects.get(pk=request.json_body['time_slot'])
 
     booking = Booking.objects.create(
         user=request.user,
-        barber=barber,
+        barber=barber.user,
         service=service,
         date=date,
         time_slot=time_slot,

@@ -6,6 +6,12 @@ class Event(models.Model):
     description = models.TextField(blank=True, null=True)
     date = models.DateField()
     time = models.TimeField()
+    image = models.ImageField(
+        upload_to='media/events_images/',
+        default='events_images/no_event.png',
+        blank=True,
+        null=True,
+    )
     location = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
