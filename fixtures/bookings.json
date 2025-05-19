@@ -8,6 +8,7 @@
       "date": "2025-06-01",
       "time_slot": 1,
       "status": 2,
+      "barber": 1,
       "created_at": "2025-05-10T12:30:00"
     }
   },
@@ -15,11 +16,12 @@
     "model": "bookings.booking",
     "pk": 2,
     "fields": {
-      "user": 339,
+      "user": 1,
       "service": 2,
       "date": "2025-06-01",
       "time_slot": 2,
       "status": 1,
+      "barber": 1,
       "created_at": "2025-05-10T12:35:00"
     }
   },
@@ -27,11 +29,12 @@
     "model": "bookings.booking",
     "pk": 3,
     "fields": {
-      "user": 340,
+      "user": 1,
       "service": 3,
       "date": "2025-06-10",
       "time_slot": 3,
       "status": 2,
+      "barber": 1,
       "created_at": "2025-05-10T12:40:00"
     }
   }

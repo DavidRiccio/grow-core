@@ -20,5 +20,60 @@
       "stock": 50,
       "image": "product_images/corte_cabello.jpg"
     }
+  },
+  {
+    "model": "products.product",
+    "pk": 3,
+    "fields": {
+      "name": "Acondicionador Profundo",
+      "description": "Acondicionador reparador para cabello dañado.",
+      "price": "12.00",
+      "stock": 75,
+      "image": "product_images/acondicionador.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 4,
+    "fields": {
+      "name": "Mascarilla Capilar",
+      "description": "Tratamiento intensivo de keratina para cabello suave.",
+      "price": "18.50",
+      "stock": 40,
+      "image": "product_images/mascarilla.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "name": "Gel Fijador",
+      "description": "Gel profesional para peinados de alta fijación.",
+      "price": "8.75",
+      "stock": 120,
+      "image": "product_images/gel_fijador.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "name": "Tinte Permanente",
+      "description": "Tinte profesional con fórmula protectora.",
+      "price": "22.00",
+      "stock": 60,
+      "image": "product_images/tinte.jpg"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 7,
+    "fields": {
+      "name": "Tratamiento de Keratina",
+      "description": "Servicio profesional de alisado con keratina.",
+      "price": "65.00",
+      "stock": 25,
+      "image": "product_images/keratina.jpg"
+    }
   }
 ]

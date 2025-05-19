@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'services.apps.ServicesConfig',
     'orders.apps.OrdersConfig',
     'accounts.apps.AccountsConfig',
+    'tele_bot.apps.Tele_botConfig',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
+TELEGRAM_BOT_TOKEN = '7480598750:AAGk3gjDP20qoGZmlwg7Xo1re2b3OOGl4Jk'
+ADMIN_CHAT_ID = 1920633138

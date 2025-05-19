@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.utils.timezone import now, timedelta
 
 from services.models import Service
+from users.models import Profile
 
 
 class TimeSlot(models.Model):
@@ -21,6 +22,13 @@ class Booking(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bookings'
+    )
+    barber = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='barber_bookings',
+        limit_choices_to={'profile__role': Profile.Role.WORKER},  # Filtra por rol en Profile
+        verbose_name='Barbero',
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bookings')
     date = models.DateField()

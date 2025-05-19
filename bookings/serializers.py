@@ -14,6 +14,8 @@ class BookingSerializer(BaseSerializer):
             'time_slot': TimeSlotSerializer(instance.time_slot).serialize_instance(
                 instance.time_slot
             ),
+            'barber': instance.barber.get_full_name(),
+            'barber_id': instance.barber.id,
             'status': instance.status,
             'created_at': instance.created_at,
         }

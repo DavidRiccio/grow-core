@@ -6,3 +6,5 @@ types-requests==2.31.0.1
 Pillow==10.3.0  
 django-cors-headers
 django-extensions
+python-telegram-bot==20.3  # Para integración con Telegram
+python-dotenv==1.0.0 
