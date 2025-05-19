@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -14,17 +15,20 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
+@login_required
 def product_list(request):
     products = ProductSerializer(Product.objects.all())
     return products.json_response()
 
 
+@login_required
 def product_detail(request, product_pk):
     product = get_object_or_404(Product, pk=product_pk)
     serializer = ProductSerializer(product, request=request)
     return serializer.json_response()
 
 
+@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -41,6 +45,7 @@ def add_product(request):
     return JsonResponse({'id': product.pk})
 
 
+@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -60,6 +65,7 @@ def edit_product(request, product_pk: int):
     return JsonResponse({'msg': 'Product has been edited'})
 
 
+@login_required
 @csrf_exempt
 @required_method('POST')
 @verify_token

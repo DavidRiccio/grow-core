@@ -21,12 +21,14 @@ from django.contrib import admin
 from django.urls import include, path
 
 import accounts.views
+import users.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', accounts.views.user_login, name='login'),
     path('logout/', accounts.views.user_logout, name='logout'),
     path('signup/', accounts.views.user_signup, name='signup'),
+    path('api/user/', users.views.get_user_profile, name='user'),
     path('api/bookings/', include('bookings.urls')),
     path('api/products/', include('products.urls')),
     path('api/services/', include('services.urls')),

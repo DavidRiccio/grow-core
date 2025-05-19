@@ -14,7 +14,6 @@ from .models import Event
 from .serializers import EventSerializer
 
 
-# Create your views here.
 def event_list(request):
     events = Event.objects.all()
     serializer = EventSerializer(events, request=request)

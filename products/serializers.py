@@ -9,7 +9,5 @@ class ProductSerializer(BaseSerializer):
             'description': instance.description,
             'price': instance.price,
             'stock': instance.stock,
-            'image': self.build_url(instance.image.url),
+            'image': f'http://localhost:8000v{self.build_url(instance.image.url)}',
         }
-
-

@@ -16,6 +16,9 @@ class TimeSlot(models.Model):
 
 
 class Booking(models.Model):
+    class Meta:
+        unique_together = ['barber', 'date', 'time_slot']
+
     class Status(models.IntegerChoices):
         CONFIRMED = 2, 'Confirmed'
         CANCELLED = -1, 'Cancelled'
@@ -27,7 +30,7 @@ class Booking(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='barber_bookings',
-        limit_choices_to={'profile__role': Profile.Role.WORKER},  # Filtra por rol en Profile
+        limit_choices_to={'profile__role': Profile.Role.WORKER},
         verbose_name='Barbero',
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bookings')
@@ -39,7 +42,7 @@ class Booking(models.Model):
     @classmethod
     def earnings_summary(cls):
         today = now().date()
-        start_week = today - timedelta(days=today.weekday())  # lunes
+        start_week = today - timedelta(days=today.weekday())
         start_month = today.replace(day=1)
 
         daily = (

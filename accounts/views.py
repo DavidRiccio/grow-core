@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -20,6 +21,7 @@ def user_login(request):
         return JsonResponse({'msg': 'Usuario logeado', 'Token': user.token.key})
 
 
+@login_required
 def user_logout(request):
     logout(request)
     return JsonResponse({'msg': 'Sesion Cerrada'})
@@ -35,7 +37,6 @@ def user_signup(request):
     last_name = request.json_body['last_name']
     email = request.json_body['email']
 
-    # Crea el usuario
     user = User(
         username=username,
         first_name=first_name,
@@ -43,10 +44,8 @@ def user_signup(request):
         email=email,
     )
 
-    # Establece la contraseña (esto la hashea)
     user.set_password(password)
 
-    # Guarda el usuario en la base de datos
     user.save()
 
     return JsonResponse({'msg': f'se ha creado el usuario {user.username}'})
