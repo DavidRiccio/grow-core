@@ -11,10 +11,14 @@ from shared.decorators import (
     verify_admin,
     verify_token,
 )
-from users.models import Profile
 
-from .decorators import verify_barber, verify_booking, verify_time_slot
-from .models import Booking, TimeSlot
+from .decorators import (
+    validate_barber_and_timeslot_existence,
+    validate_barber_availability,
+    verify_booking,
+    verify_time_slot,
+)
+from .models import Booking
 from .serializers import BookingEarningsSerializer, BookingSerializer
 
 User = get_user_model()
@@ -34,20 +38,23 @@ def booking_list(request):
 @load_json_body
 @required_fields('service', 'time_slot', 'date', 'barber', model=Booking)
 @verify_token
+@validate_barber_and_timeslot_existence
+@validate_barber_availability
 def create_booking(request):
     service_pk = request.json_body['service']
     date = request.json_body['date']
 
-    service = Service.objects.get(pk=service_pk)
-    barber = Profile.objects.get(pk=request.json_body['barber'])
-    time_slot = TimeSlot.objects.get(pk=request.json_body['time_slot'])
+    try:
+        service = Service.objects.get(pk=service_pk)
+    except Service.DoesNotExist:
+        return JsonResponse({'error': 'Servicio no encontrado.'}, status=400)
 
     booking = Booking.objects.create(
         user=request.user,
-        barber=barber.user,
+        barber=request.barber_profile.user,
         service=service,
         date=date,
-        time_slot=time_slot,
+        time_slot=request.time_slot,
     )
 
     return JsonResponse({'id': booking.pk})
@@ -69,7 +76,8 @@ def earnings_summary(request):
 @verify_token
 @verify_booking
 @verify_time_slot
-@verify_barber
+@validate_barber_and_timeslot_existence
+@validate_barber_availability
 def edit_booking(request, booking_pk):
     service_pk = request.json_body['service']
     date = request.json_body['date']
@@ -90,7 +98,6 @@ def edit_booking(request, booking_pk):
 
 @login_required
 @required_method('GET')
-@verify_booking
 def booking_detail(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
     serializer = BookingSerializer(booking, request=request)

@@ -23,12 +23,36 @@ def verify_time_slot(func):
             return JsonResponse({'error', 'Time Slot not found'}, status=404)
 
 
-def verify_barber(func):
-    def wrapper(request, *args, **kwargs):
+def validate_barber_and_timeslot_existence(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        data = request.json_body
+
         try:
-            profile = Profile.objects.get(pk=request.json_body.get('barber'))
-            if profile.role != 'W':
-                return JsonResponse({'error': 'The user is not a Barber'}, status=404)
-            request.barber = profile
+            request.barber_profile = Profile.objects.get(pk=data['barber'])
         except Profile.DoesNotExist:
-            return JsonResponse({'error': 'The barber does not exists'})
+            return JsonResponse({'error': 'Barbero no encontrado.'}, status=400)
+
+        try:
+            request.time_slot = TimeSlot.objects.get(pk=data['time_slot'])
+        except TimeSlot.DoesNotExist:
+            return JsonResponse({'error': 'Horario no válido.'}, status=400)
+
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
+
+
+def validate_barber_availability(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        date = request.json_body['date']
+        barber_user = request.barber_profile.user
+        time_slot = request.time_slot
+
+        if Booking.objects.filter(barber=barber_user, date=date, time_slot=time_slot).exists():
+            return JsonResponse(
+                {'error': 'El barbero no está disponible en ese horario.'}, status=400
+            )
+
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view

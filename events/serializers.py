@@ -10,5 +10,5 @@ class EventSerializer(BaseSerializer):
             'date': instance.date,
             'time': instance.time,
             'location': instance.location,
-            'created_at': instance.created_at,
+            'image': f'{self.build_url(instance.image.url)}',
         }

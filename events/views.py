@@ -1,4 +1,5 @@
 # Create your views here.
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -14,12 +15,15 @@ from .models import Event
 from .serializers import EventSerializer
 
 
+@required_method('GET')
 def event_list(request):
     events = Event.objects.all()
     serializer = EventSerializer(events, request=request)
     return serializer.json_response()
 
 
+@login_required
+@required_method('GET')
 def event_detail(request, event_pk):
     event = Event.objects.get(pk=event_pk)
     serializer = EventSerializer(event, request=request)
