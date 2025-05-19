@@ -7,7 +7,7 @@
       "description": "Shampoo nutritivo para todo tipo de cabello.",
       "price": "10.50",
       "stock": 100,
-      "image": "product_images/shampoo.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -18,7 +18,7 @@
       "description": "Corte de cabello clásico.",
       "price": "15.00",
       "stock": 50,
-      "image": "product_images/corte_cabello.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -29,7 +29,7 @@
       "description": "Acondicionador reparador para cabello dañado.",
       "price": "12.00",
       "stock": 75,
-      "image": "product_images/acondicionador.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -40,7 +40,7 @@
       "description": "Tratamiento intensivo de keratina para cabello suave.",
       "price": "18.50",
       "stock": 40,
-      "image": "product_images/mascarilla.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -51,7 +51,7 @@
       "description": "Gel profesional para peinados de alta fijación.",
       "price": "8.75",
       "stock": 120,
-      "image": "product_images/gel_fijador.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -62,7 +62,7 @@
       "description": "Tinte profesional con fórmula protectora.",
       "price": "22.00",
       "stock": 60,
-      "image": "product_images/tinte.jpg"
+      "image": "product_images/no_product.png"
     }
   },
   {
@@ -73,7 +73,7 @@
       "description": "Servicio profesional de alisado con keratina.",
       "price": "65.00",
       "stock": 25,
-      "image": "product_images/keratina.jpg"
+      "image": "product_images/no_product.png"
     }
   }
 ]
