@@ -9,6 +9,12 @@ class Service(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    image = models.ImageField(
+        upload_to='media/services_images/',
+        default='services_images/no_service.png',
+        blank=True,
+        null=True,
+    )
     duration = models.DurationField()
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from shared.decorators import (
@@ -15,17 +14,9 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
-@login_required
 def product_list(request):
     products = ProductSerializer(Product.objects.all())
     return products.json_response()
-
-
-@login_required
-def product_detail(request, product_pk):
-    product = get_object_or_404(Product, pk=product_pk)
-    serializer = ProductSerializer(product, request=request)
-    return serializer.json_response()
 
 
 @login_required
@@ -53,14 +44,10 @@ def add_product(request):
 @verify_admin
 def edit_product(request, product_pk: int):
     product = Product.objects.get(pk=product_pk)
-    if request.json_body['name']:
-        product.name = request.json_body['name']
-    if request.json_body['description']:
-        product.description = request.json_body['description']
-    if request.json_body['price']:
-        product.price = request.json_body['price']
-    if request.json_body['stock']:
-        product.stock = request.json_body['stock']
+    product.name = request.json_body['name']
+    product.description = request.json_body['description']
+    product.price = request.json_body['price']
+    product.stock = request.json_body['stock']
     product.save()
     return JsonResponse({'msg': 'Product has been edited'})
 
