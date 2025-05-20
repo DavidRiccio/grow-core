@@ -153,5 +153,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'grow.testing.daw@gmail.com'
 EMAIL_HOST_PASSWORD = 'wtqwosljrrzdayje'
-
+LOGIN_URL = 'login/'
 # Reemplaza /ruta/a/tu/proyecto con la ruta real

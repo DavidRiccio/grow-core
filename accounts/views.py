@@ -18,7 +18,7 @@ def user_login(request):
     password = request.json_body['password']
     if user := authenticate(request, username=username, password=password):
         login(request, user)
-        return JsonResponse({'msg': 'Usuario logeado', 'Token': user.token.key})
+        return JsonResponse({'msg': 'Usuario logeado', 'token': user.token.key})
 
 
 @login_required
