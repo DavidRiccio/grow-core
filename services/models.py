@@ -11,7 +11,7 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     image = models.ImageField(
         upload_to='media/services_images/',
-        default='services_images/no_service.png',
+        default='no_service.png',
         blank=True,
         null=True,
     )

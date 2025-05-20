@@ -75,3 +75,14 @@ def verify_admin(func):
         return JsonResponse({'error': 'The user must be an admin'}, status=403)
 
     return wrapper
+
+
+def set_default_image(func):
+    def wrapper(request, *args, **kwargs):
+        if 'image' not in getattr(request, 'json_body', {}) or not request.json_body.get('image'):
+            request.image = 'events_images/no_event.png'
+        else:
+            request.image = request.json_body.get('image')
+        return func(request, *args, **kwargs)
+
+    return wrapper

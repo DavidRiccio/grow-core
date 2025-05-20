@@ -8,7 +8,7 @@ class Event(models.Model):
     time = models.TimeField()
     image = models.ImageField(
         upload_to='media/events_images/',
-        default='events_images/no_event.png',
+        default='no_event.png',
         blank=True,
         null=True,
     )

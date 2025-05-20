@@ -16,7 +16,6 @@ from .decorators import (
     validate_barber_and_timeslot_existence,
     validate_barber_availability,
     verify_booking,
-    verify_time_slot,
 )
 from .models import Booking
 from .serializers import BookingEarningsSerializer, BookingSerializer
@@ -25,6 +24,7 @@ User = get_user_model()
 
 
 @login_required
+@csrf_exempt
 @required_method('GET')
 def booking_list(request):
     bookings = Booking.objects.all()
@@ -61,6 +61,7 @@ def create_booking(request):
 
 
 @login_required
+@csrf_exempt
 @required_method('GET')
 @verify_admin
 def earnings_summary(request):
@@ -75,7 +76,6 @@ def earnings_summary(request):
 @required_fields('service', 'time_slot', 'date', 'barber', model=Booking)
 @verify_token
 @verify_booking
-@verify_time_slot
 @validate_barber_and_timeslot_existence
 @validate_barber_availability
 def edit_booking(request, booking_pk):
@@ -83,23 +83,23 @@ def edit_booking(request, booking_pk):
     date = request.json_body['date']
 
     service = Service.objects.get(pk=service_pk)
-    time_slot = request.time_slot.pk
-    barber = request.barber.pk
     booking = request.booking
 
     booking.service = service
-    booking.barber = barber
+    booking.barber = request.barber_profile.user
     booking.date = date
-    booking.time_slot = time_slot
+    booking.time_slot = request.time_slot
     booking.save()
 
     return JsonResponse({'msg': 'Booking has been edited'})
 
 
 @login_required
+@csrf_exempt
 @required_method('GET')
-def booking_detail(request, booking_id):
-    booking = Booking.objects.get(id=booking_id)
+@verify_booking
+def booking_detail(request, booking_pk):
+    booking = request.booking
     serializer = BookingSerializer(booking, request=request)
     return serializer.json_response()
 
@@ -107,10 +107,9 @@ def booking_detail(request, booking_id):
 @login_required
 @csrf_exempt
 @required_method('POST')
-@load_json_body
 @verify_token
 @verify_booking
 def delete_booking(request, booking_pk):
-    booking = Booking.objects.get(pk=booking_pk)
+    booking = request.booking
     booking.delete()
-    return JsonResponse({'msg': 'Event has been deleted'})
+    return JsonResponse({'msg': 'Booking has been deleted'})

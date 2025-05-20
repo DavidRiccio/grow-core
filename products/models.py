@@ -8,7 +8,7 @@ class Product(models.Model):
     stock = models.PositiveIntegerField()
     image = models.ImageField(
         upload_to='media/product_images/',
-        default='product_images/no_product.png',
+        default='no_product.png',
         blank=True,
         null=True,
     )

@@ -1,4 +1,4 @@
-# Create your views here.
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -10,25 +10,30 @@ from shared.decorators import (
     verify_token,
 )
 
+from .decorators import verify_service
 from .models import Service
 from .serializers import ServiceSerializer
 
 
+@login_required
+@csrf_exempt
+@required_method('GET')
 def service_list(request):
     services = Service.objects.all()
     serializer = ServiceSerializer(services, request=request)
     return serializer.json_response()
 
 
+@login_required
+@csrf_exempt
+@required_method('GET')
+@verify_service
 def service_detail(request, service_pk):
-    try:
-        service = Service.objects.get(id=service_pk)
-        serializer = ServiceSerializer(service, request=request)
-        return serializer.json_response()
-    except Service.DoesNotExist:
-        return JsonResponse({'error': 'Service not found'}, status=404)
+    serializer = ServiceSerializer(request.service, request=request)
+    return serializer.json_response()
 
 
+@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -48,22 +53,21 @@ def add_service(request):
     return JsonResponse({'id': service.pk})
 
 
+@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
+@required_fields('name', 'description', 'price', 'duration', model=Service)
 @verify_token
 @verify_admin
+@verify_service
 def edit_service(request, service_pk: int):
-    service = Service.objects.get(pk=service_pk)
-    if request.json_body['name']:
-        service.name = request.json_body['name']
-    if request.json_body['description']:
-        service.description = request.json_body['description']
-    if request.json_body['price']:
-        service.price = request.json_body['price']
-    if request.json_body['duration']:
-        duration = request.json_body['duration']
-        service.duration = Service.convert_duration_string(duration)
+    service = request.service
+    service.name = request.json_body['name']
+    service.description = request.json_body['description']
+    service.price = request.json_body['price']
+    duration = request.json_body['duration']
+    service.duration = Service.convert_duration_string(duration)
     service.save()
     return JsonResponse({'msg': 'Service has been edited'})
 
@@ -72,7 +76,8 @@ def edit_service(request, service_pk: int):
 @required_method('POST')
 @verify_token
 @verify_admin
+@verify_service
 def delete_service(request, service_pk: int):
-    service = Service.objects.get(pk=service_pk)
+    service = request.service
     service.delete()
     return JsonResponse({'msg': 'Service has been deleted'})

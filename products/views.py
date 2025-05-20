@@ -10,13 +10,26 @@ from shared.decorators import (
     verify_token,
 )
 
+from .decorators import verify_product
 from .models import Product
 from .serializers import ProductSerializer
 
 
+@login_required
+@csrf_exempt
+@required_method('GET')
 def product_list(request):
     products = ProductSerializer(Product.objects.all())
     return products.json_response()
+
+
+@login_required
+@csrf_exempt
+@required_method('GET')
+@verify_product
+def product_detail(request):
+    serializer = ProductSerializer(request.product, request=request)
+    return serializer.json_response()
 
 
 @login_required
@@ -40,10 +53,12 @@ def add_product(request):
 @csrf_exempt
 @required_method('POST')
 @load_json_body
+@required_fields('name', 'description', 'price', 'stock', model=Product)
 @verify_token
 @verify_admin
+@verify_product
 def edit_product(request, product_pk: int):
-    product = Product.objects.get(pk=product_pk)
+    product = request.product
     product.name = request.json_body['name']
     product.description = request.json_body['description']
     product.price = request.json_body['price']
@@ -57,7 +72,8 @@ def edit_product(request, product_pk: int):
 @required_method('POST')
 @verify_token
 @verify_admin
+@verify_product
 def delete_product(request, product_pk: int):
-    product = Product.objects.get(pk=product_pk)
+    product = request.product
     product.delete()
     return JsonResponse({'msg': 'Product has been deleted'})
