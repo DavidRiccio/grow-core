@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.http import JsonResponse
 
-from .models import Order, OrderItem
+from .models import Order
 
 
 def verify_user(func):
@@ -24,18 +24,6 @@ def verify_order(func):
             request.order = order
         except Order.DoesNotExist:
             return JsonResponse({'error': 'Order not found'}, status=404)
-        return func(request, *args, **kwargs)
-
-    return wrapper
-
-
-def verify_order_item(func):
-    def wrapper(request, *args, **kwargs):
-        try:
-            order_item = OrderItem.objects.get(order=request.order)
-            request.order_item = order_item
-        except OrderItem.DoesNotExist:
-            return JsonResponse({'error': 'Order Item not found'}, status=404)
         return func(request, *args, **kwargs)
 
     return wrapper

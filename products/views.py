@@ -15,7 +15,6 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
 def product_list(request):
@@ -23,11 +22,10 @@ def product_list(request):
     return products.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
 @verify_product
-def product_detail(request):
+def product_detail(request, product_pk):
     serializer = ProductSerializer(request.product, request=request)
     return serializer.json_response()
 
@@ -63,6 +61,7 @@ def edit_product(request, product_pk: int):
     product.description = request.json_body['description']
     product.price = request.json_body['price']
     product.stock = request.json_body['stock']
+    product.image = request.image
     product.save()
     return JsonResponse({'msg': 'Product has been edited'})
 

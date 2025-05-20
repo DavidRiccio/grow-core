@@ -10,8 +10,8 @@ from shared.decorators import (
     verify_token,
 )
 
-from .decorators import validate_credit_card, verify_order, verify_order_item
-from .models import Order, OrderItem
+from .decorators import validate_credit_card, verify_order
+from .models import Order
 from .serializers import OrderSerializer
 
 
@@ -38,7 +38,6 @@ def order_detail(request, order_pk: int):
 @verify_token
 def add_order(request):
     order = Order.objects.create(user=request.user)
-    OrderItem.objects.create(order=order)
     return JsonResponse({'id': order.pk})
 
 
@@ -59,15 +58,14 @@ def delete_order(request, order_pk: int):
 @required_fields('id', model=Product)
 @verify_token
 @verify_order
-@verify_order_item
 def add_product_to_order(request, order_pk: int):
-    order_item = request.order_item
+    order = request.order
     try:
         product = Product.objects.get(pk=request.json_body['id'])
     except Product.DoesNotExist:
         return JsonResponse({'msg': 'Product not found'}, status=404)
-    order_item.add(product)
-    order_item.decrease_stock()
+    order.add(product)
+    order.decrease_stock()
     return JsonResponse({'msg': f'Se añadio correctamente el Producto {product}'})
 
 
@@ -90,4 +88,5 @@ def pay_order(request, order_pk: int):
 def cancell_order(request, order_pk: int):
     request.order.update_status(Order.Status.CANCELLED)
     request.order.increase_stock()
+    request.order.delete()
     return JsonResponse({'msg': 'Your order has been cancelled successfully'})

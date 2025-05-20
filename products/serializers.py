@@ -9,5 +9,5 @@ class ProductSerializer(BaseSerializer):
             'description': instance.description,
             'price': instance.price,
             'stock': instance.stock,
-            'image': f'http://localhost:8000{self.build_url(instance.image.url)}',
+            'image': f'{self.build_url(instance.image.url)}',
         }

@@ -10,3 +10,6 @@ def verify_product(func):
             request.product = product
         except Product.DoesNotExists:
             return JsonResponse({'error', 'Product not found'}, status=404)
+        return func(request, *args, **kwargs)
+
+    return wrapper

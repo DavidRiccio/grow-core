@@ -6,7 +6,6 @@ from shared.decorators import (
     load_json_body,
     required_fields,
     required_method,
-    set_default_image,
     verify_admin,
     verify_token,
 )
@@ -16,7 +15,6 @@ from .models import Event
 from .serializers import EventSerializer
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
 def event_list(request):
@@ -25,8 +23,6 @@ def event_list(request):
     return serializer.json_response()
 
 
-@login_required
-@csrf_exempt
 @required_method('GET')
 @verify_event
 def event_detail(request, event_pk):
@@ -42,7 +38,6 @@ def event_detail(request, event_pk):
 @required_fields('name', 'description', 'date', 'time', 'location', model=Event)
 @verify_token
 @verify_admin
-@set_default_image
 def add_event(request):
     name = request.json_body['name']
     description = request.json_body['description']
@@ -69,7 +64,6 @@ def add_event(request):
 @verify_token
 @verify_admin
 @verify_event
-@set_default_image
 def edit_event(request, event_pk: int):
     event = request.event
     event.name = request.json_body['name']

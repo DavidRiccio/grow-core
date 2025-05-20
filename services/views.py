@@ -15,7 +15,6 @@ from .models import Service
 from .serializers import ServiceSerializer
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
 def service_list(request):
@@ -24,7 +23,6 @@ def service_list(request):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
 @verify_service

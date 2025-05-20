@@ -8,5 +8,8 @@ def verify_service(func):
         try:
             service = Service.objects.get(id=kwargs['service_pk'])
             request.service = service
-        except Service.DoesNotExists:
-            return JsonResponse({'error', 'Service not found'}, status=404)
+            return func(request, *args, **kwargs)
+        except Service.DoesNotExist:
+            return JsonResponse({'error': 'Service not found'}, status=404)
+
+    return wrapper
