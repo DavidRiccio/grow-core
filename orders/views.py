@@ -19,7 +19,7 @@ from .serializers import OrderSerializer
 @csrf_exempt
 @required_method('GET')
 def order_list(request):
-    orders = OrderSerializer(Order.objects.all())
+    orders = OrderSerializer(Order.objects.all(), request=request)
     return orders.json_response()
 
 
@@ -37,8 +37,12 @@ def order_detail(request, order_pk: int):
 @required_method('POST')
 @verify_token
 def add_order(request):
-    order = Order.objects.create(user=request.user)
-    return JsonResponse({'id': order.pk})
+    # Crear orden usando el serializador (ahora maneja productos)
+    serializer = OrderSerializer(data=request.POST, context={'request': request})
+    if serializer.is_valid():
+        order = serializer.save()
+        return JsonResponse({'id': order.pk})
+    return JsonResponse(serializer.errors, status=400)
 
 
 @login_required
@@ -49,7 +53,7 @@ def add_order(request):
 def delete_order(request, order_pk: int):
     order = request.order
     order.delete()
-    return JsonResponse({'msg': 'Product has been deleted'})
+    return JsonResponse({'msg': 'Order has been deleted'})
 
 
 @csrf_exempt
@@ -65,8 +69,8 @@ def add_product_to_order(request, order_pk: int):
     except Product.DoesNotExist:
         return JsonResponse({'msg': 'Product not found'}, status=404)
     order.add(product)
-    order.decrease_stock()
-    return JsonResponse({'msg': f'Se añadio correctamente el Producto {product}'})
+    # Stock se manejará al confirmar la orden, no aquí
+    return JsonResponse({'msg': f'Producto {product} añadido correctamente'})
 
 
 @csrf_exempt
@@ -77,8 +81,11 @@ def add_product_to_order(request, order_pk: int):
 @verify_order
 @validate_credit_card
 def pay_order(request, order_pk: int):
-    request.order.update_status(Order.Status.COMPLETED)
-    return JsonResponse({'msg': 'Your order has been paid successfully'})
+    try:
+        request.order.confirm_order()  # Nuevo método integrado
+        return JsonResponse({'msg': 'Orden pagada y confirmada'})
+    except Exception as e:
+        return JsonResponse({'msg': str(e)}, status=400)
 
 
 @csrf_exempt
@@ -86,7 +93,8 @@ def pay_order(request, order_pk: int):
 @verify_token
 @verify_order
 def cancell_order(request, order_pk: int):
-    request.order.update_status(Order.Status.CANCELLED)
-    request.order.increase_stock()
-    request.order.delete()
-    return JsonResponse({'msg': 'Your order has been cancelled successfully'})
+    try:
+        request.order.cancel_order()  # Nuevo método que maneja stock y estado
+        return JsonResponse({'msg': 'Orden cancelada correctamente'})
+    except Exception as e:
+        return JsonResponse({'msg': str(e)}, status=400)

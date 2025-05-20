@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -21,23 +22,30 @@ class Order(models.Model):
 
     @property
     def price(self):
-        total = 0
-        for product in self.products.all():
-            total += product.price
-        return float(total)
+        return float(sum(product.price for product in self.products.all()))
 
-    def increase_stock(self):
+    def _update_stock(self, increment: bool):
+        """Actualiza el stock de los productos y valida disponibilidad."""
         for product in self.products.all():
-            product.stock += 1
+            if not increment and product.stock < 1:
+                raise ValidationError(f'Stock insuficiente para {product.name}')
+            product.stock += 1 if increment else -1
             product.save()
 
-    def decrease_stock(self):
-        for product in self.products.all():
-            product.stock -= 1
-            product.save()
+    def confirm_order(self):
+        """Confirma la orden, disminuye el stock y actualiza el estado."""
+        if self.status != self.Status.PENDING:
+            raise ValidationError('La orden ya fue procesada.')
+        self._update_stock(increment=False)
+        self.status = self.Status.COMPLETED
+        self.save()
 
-    def update_status(self, status):
-        self.status = status
+    def cancel_order(self):
+        """Cancela la orden y restaura el stock."""
+        if self.status != self.Status.COMPLETED:
+            raise ValidationError('Solo se pueden cancelar órdenes completadas.')
+        self._update_stock(increment=True)
+        self.status = self.Status.CANCELLED
         self.save()
 
     def add(self, product):
