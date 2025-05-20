@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +12,7 @@ from shared.decorators import (
     verify_token,
 )
 
-from .decorators import validate_credit_card, verify_order
+from .decorators import validate_credit_card, validate_status, verify_order, verify_user
 from .models import Order
 from .serializers import OrderSerializer
 
@@ -18,15 +20,8 @@ from .serializers import OrderSerializer
 @login_required
 @csrf_exempt
 @required_method('GET')
-def order_list(request):
-    orders = OrderSerializer(Order.objects.all(), request=request)
-    return orders.json_response()
-
-
-@login_required
-@csrf_exempt
-@required_method('GET')
 @verify_order
+@verify_user
 def order_detail(request, order_pk: int):
     serializer = OrderSerializer(request.order, request=request)
     return serializer.json_response()
@@ -35,42 +30,30 @@ def order_detail(request, order_pk: int):
 @login_required
 @csrf_exempt
 @required_method('POST')
+@load_json_body
 @verify_token
 def add_order(request):
-    # Crear orden usando el serializador (ahora maneja productos)
-    serializer = OrderSerializer(data=request.POST, context={'request': request})
-    if serializer.is_valid():
-        order = serializer.save()
-        return JsonResponse({'id': order.pk})
-    return JsonResponse(serializer.errors, status=400)
+    order_data = request.json_body
+    order = Order(user=request.user)
+    order.save()
+    total_price = Decimal('0.00')
+    for item in order_data['products']:
+        product_pk = item['id']
+        quantity = item['quantity']
+        try:
+            product = Product.objects.get(pk=product_pk)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': f'Product with id {product_pk} not found'}, status=404)
+        if product.stock < quantity:
+            return JsonResponse({'error': f'Insufficient stock for {product.name}'}, status=400)
+        product.stock -= quantity
+        product.save()
+        order.products.add(product)
+        total_price += product.price * Decimal(quantity)
+    order.price = total_price
+    order.save()
 
-
-@login_required
-@csrf_exempt
-@required_method('POST')
-@verify_token
-@verify_order
-def delete_order(request, order_pk: int):
-    order = request.order
-    order.delete()
-    return JsonResponse({'msg': 'Order has been deleted'})
-
-
-@csrf_exempt
-@required_method('POST')
-@load_json_body
-@required_fields('id', model=Product)
-@verify_token
-@verify_order
-def add_product_to_order(request, order_pk: int):
-    order = request.order
-    try:
-        product = Product.objects.get(pk=request.json_body['id'])
-    except Product.DoesNotExist:
-        return JsonResponse({'msg': 'Product not found'}, status=404)
-    order.add(product)
-    # Stock se manejará al confirmar la orden, no aquí
-    return JsonResponse({'msg': f'Producto {product} añadido correctamente'})
+    return JsonResponse({'id': order.pk})
 
 
 @csrf_exempt
@@ -80,21 +63,32 @@ def add_product_to_order(request, order_pk: int):
 @verify_token
 @verify_order
 @validate_credit_card
+@verify_user
+@validate_status
 def pay_order(request, order_pk: int):
-    try:
-        request.order.confirm_order()  # Nuevo método integrado
-        return JsonResponse({'msg': 'Orden pagada y confirmada'})
-    except Exception as e:
-        return JsonResponse({'msg': str(e)}, status=400)
+    request.order.status = Order.Status.COMPLETED
+    request.order.save()
+    return JsonResponse({'msg': 'Your order has been paid and complete successfully'})
 
 
 @csrf_exempt
 @required_method('POST')
+@load_json_body
 @verify_token
 @verify_order
+@verify_user
+@validate_status
 def cancell_order(request, order_pk: int):
-    try:
-        request.order.cancel_order()  # Nuevo método que maneja stock y estado
-        return JsonResponse({'msg': 'Orden cancelada correctamente'})
-    except Exception as e:
-        return JsonResponse({'msg': str(e)}, status=400)
+    order_data = request.json_body
+    for item in order_data['products']:
+        product_pk = item['id']
+        quantity = item['quantity']
+        try:
+            product = Product.objects.get(pk=product_pk)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': f'Product with id {product_pk} not found'}, status=404)
+        product.stock += quantity
+        product.save()
+    request.order.status = Order.Status.CANCELLED
+    request.order.save()
+    return JsonResponse({'msg': f'Order {order_pk} has been cancelled'})

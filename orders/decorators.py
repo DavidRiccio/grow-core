@@ -7,12 +7,12 @@ from .models import Order
 
 
 def verify_user(func):
-    def wrapper(request, order_pk, *args, **kwargs):
-        order = Order.objects.get(pk=order_pk)
+    def wrapper(request, *args, **kwargs):
+        order = Order.objects.get(pk=kwargs['order_pk'])
 
         if order.user != request.user:
             return JsonResponse({'error': 'User is not the owner of requested order'}, status=403)
-        return func(request, order_pk, *args, **kwargs)
+        return func(request, *args, **kwargs)
 
     return wrapper
 
@@ -47,6 +47,17 @@ def validate_credit_card(func):
         current_date = datetime.now()
         if card_exp_date < current_date:
             return JsonResponse({'error': 'Card expired'}, status=400)
+        return func(request, *args, **kwargs)
+
+    return wrapper
+
+
+def validate_status(func):
+    def wrapper(request, *args, **kwargs):
+        if request.order.status == Order.Status.CANCELLED:
+            return JsonResponse({'error': 'You cannot modify a canceled order.'}, status=400)
+        if request.order.status == Order.Status.COMPLETED:
+            return JsonResponse({'error': 'You cannot modify a completed order.'}, status=400)
         return func(request, *args, **kwargs)
 
     return wrapper
