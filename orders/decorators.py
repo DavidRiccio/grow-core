@@ -7,6 +7,19 @@ from .models import Order
 
 
 def verify_user(func):
+    """
+    Decorador que verifica si el usuario autenticado es el propietario de la orden.
+
+    Si el usuario que realiza la solicitud no es el dueño de la orden especificada en 'order_pk',
+    se devuelve una respuesta JSON con error 403 (Forbidden).
+
+    Args:
+        func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada que incluye la verificación del usuario.
+    """
+
     def wrapper(request, *args, **kwargs):
         order = Order.objects.get(pk=kwargs['order_pk'])
 
@@ -18,6 +31,19 @@ def verify_user(func):
 
 
 def verify_order(func):
+    """
+    Decorador que intenta recuperar la orden según el 'order_pk' de la URL.
+
+    Si la orden existe, se adjunta al objeto request como 'request.order'.
+    Si no existe, devuelve una respuesta JSON con error 404 (Not Found).
+
+    Args:
+        func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada que incluye la verificación de existencia de la orden.
+    """
+
     def wrapper(request, *args, **kwargs):
         try:
             order = Order.objects.get(pk=kwargs['order_pk'])
@@ -30,6 +56,20 @@ def verify_order(func):
 
 
 def validate_credit_card(func):
+    """
+    Decorador que valida los datos de la tarjeta de crédito enviados en el cuerpo JSON de la solicitud.
+
+    Verifica el formato del número de tarjeta, la fecha de expiración y el CVC.
+    También comprueba que la tarjeta no esté expirada.
+    Devuelve una respuesta JSON con error 400 si alguno de los campos es inválido.
+
+    Args:
+        func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada que incluye la validación de la tarjeta de crédito.
+    """
+
     def wrapper(request, *args, **kwargs):
         CARD_NUMBER_PATTERN = re.compile(r'^\d{4}-\d{4}-\d{4}-\d{4}$')
         EXP_DATE_PATTERN = re.compile(r'^(0[1-9]|1[0-2])\/\d{4}$')
@@ -53,6 +93,21 @@ def validate_credit_card(func):
 
 
 def validate_status(func):
+    """
+    Decorador que valida el estado de una orden antes de permitir modificaciones.
+
+    Si la orden tiene estado 'CANCELLED' o 'COMPLETED', devuelve un error 400 (Bad Request)
+    indicando que no se puede modificar la orden.
+
+    Requiere que 'request.order' esté definido (usualmente proporcionado por el decorador verify_order).
+
+    Args:
+        func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada con validación de estado de la orden.
+    """
+
     def wrapper(request, *args, **kwargs):
         if request.order.status == Order.Status.CANCELLED:
             return JsonResponse({'error': 'You cannot modify a canceled order.'}, status=400)

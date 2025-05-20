@@ -4,6 +4,18 @@ from .models import Service
 
 
 def verify_service(func):
+    """
+    Verifica que el servicio especificado exista.
+
+    Este decorador intenta obtener un servicio de la base de datos utilizando
+    el ID proporcionado en los argumentos de la función. Si el servicio existe,
+    se asigna al objeto de solicitud. Si no se encuentra el servicio, se devuelve
+    un error 404.
+
+    :param func: La función a la que se aplica el decorador.
+    :return: Función envuelta que verifica la existencia del servicio.
+    """
+
     def wrapper(request, *args, **kwargs):
         try:
             service = Service.objects.get(id=kwargs['service_pk'])

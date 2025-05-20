@@ -18,6 +18,15 @@ from .serializers import ProductSerializer
 @csrf_exempt
 @required_method('GET')
 def product_list(request):
+    """
+    Devuelve una lista de todos los productos en formato JSON.
+
+    Este endpoint permite obtener todos los productos registrados en la base de datos.
+    Los productos se serializan y se devuelven en una respuesta JSON.
+
+    :param request: Objeto de solicitud HTTP.
+    :return: JsonResponse con la lista de productos.
+    """
     products = ProductSerializer(Product.objects.all())
     return products.json_response()
 
@@ -26,6 +35,16 @@ def product_list(request):
 @required_method('GET')
 @verify_product
 def product_detail(request, product_pk):
+    """
+    Devuelve los detalles de un producto específico.
+
+    Este endpoint permite obtener los detalles de un producto utilizando su ID.
+    Solo se puede acceder a este endpoint si el producto existe.
+
+    :param request: Objeto de solicitud HTTP.
+    :param product_pk: ID del producto.
+    :return: JsonResponse con los detalles del producto.
+    """
     serializer = ProductSerializer(request.product, request=request)
     return serializer.json_response()
 
@@ -38,6 +57,15 @@ def product_detail(request, product_pk):
 @verify_token
 @verify_admin
 def add_product(request):
+    """
+    Agrega un nuevo producto.
+
+    Este endpoint permite a un administrador autenticado crear un nuevo producto
+    proporcionando el nombre, descripción, precio y stock del producto.
+
+    :param request: Objeto de solicitud HTTP que contiene los datos del nuevo producto.
+    :return: JsonResponse con el ID del nuevo producto creado.
+    """
     name = request.json_body['name']
     description = request.json_body['description']
     price = request.json_body['price']
@@ -56,6 +84,16 @@ def add_product(request):
 @verify_admin
 @verify_product
 def edit_product(request, product_pk: int):
+    """
+    Edita un producto existente.
+
+    Este endpoint permite a un administrador autenticado editar un producto
+    existente proporcionando los nuevos datos del producto.
+
+    :param request: Objeto de solicitud HTTP que contiene los datos del producto.
+    :param product_pk: ID del producto a editar.
+    :return: JsonResponse con un mensaje de éxito.
+    """
     product = request.product
     product.name = request.json_body['name']
     product.description = request.json_body['description']
@@ -73,6 +111,16 @@ def edit_product(request, product_pk: int):
 @verify_admin
 @verify_product
 def delete_product(request, product_pk: int):
+    """
+    Elimina un producto existente.
+
+    Este endpoint permite a un administrador autenticado eliminar un producto
+    específico utilizando su ID.
+
+    :param request: Objeto de solicitud HTTP.
+    :param product_pk: ID del producto a eliminar.
+    :return: JsonResponse con un mensaje de éxito.
+    """
     product = request.product
     product.delete()
     return JsonResponse({'msg': 'Product has been deleted'})

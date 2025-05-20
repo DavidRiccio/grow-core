@@ -6,6 +6,19 @@ from .models import Booking, TimeSlot
 
 
 def verify_booking(func):
+    """
+    Decorador que intenta recuperar una reserva (booking) a partir de 'booking_pk' en los parámetros de la URL.
+
+    Si la reserva existe, se adjunta al objeto request como 'request.booking'.
+    Si no existe, devuelve una respuesta JSON con error 404 (Not Found).
+
+    Args:
+        func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada con la verificación de existencia de la reserva.
+    """
+
     def wrapper(request, *args, **kwargs):
         try:
             booking = Booking.objects.get(id=kwargs['booking_pk'])
@@ -19,6 +32,23 @@ def verify_booking(func):
 
 
 def validate_barber_and_timeslot_existence(view_func):
+    """
+    Decorador que valida la existencia del barbero y del bloque horario (time slot) en los datos de la solicitud.
+
+    - Verifica que el barbero especificado por ID exista y tenga el rol 'W' (barbero).
+    - Verifica que el bloque horario (time slot) exista.
+
+    Si alguno de los datos no es válido, devuelve una respuesta JSON con el error correspondiente.
+
+    Si ambos existen, se adjuntan al objeto request como 'request.barber_profile' y 'request.time_slot'.
+
+    Args:
+        view_func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada con validación de barbero y horario.
+    """
+
     def wrapper(request, *args, **kwargs):
         data = request.json_body
 
@@ -40,6 +70,20 @@ def validate_barber_and_timeslot_existence(view_func):
 
 
 def validate_barber_availability(view_func):
+    """
+    Decorador que valida si el barbero está disponible en la fecha y hora solicitadas.
+
+    Utiliza los datos 'date', 'barber_profile' y 'time_slot' previamente cargados en el request.
+    Si ya existe una reserva para ese barbero en la fecha y horario indicados,
+    devuelve una respuesta JSON con error 400 (Bad Request).
+
+    Args:
+        view_func (callable): Vista a decorar.
+
+    Returns:
+        callable: Vista decorada que valida la disponibilidad del barbero.
+    """
+
     def wrapper(request, *args, **kwargs):
         date = request.json_body['date']
         barber_user = request.barber_profile.user
