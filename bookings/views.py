@@ -46,7 +46,6 @@ def booking_list(request):
     return JsonResponse(bookings_serializer, safe=False, status=200)
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -66,6 +65,7 @@ def create_booking(request):
     :return: JsonResponse con el ID de la nueva reserva o un error si el servicio no se encuentra.
     """
     service_pk = request.json_body['service']
+    barber_id = request.json_body['barber']
     date = request.json_body['date']
 
     try:
@@ -73,9 +73,15 @@ def create_booking(request):
     except Service.DoesNotExist:
         return JsonResponse({'error': 'Servicio no encontrado.'}, status=400)
 
+    try:
+        # Buscar al barbero con su perfil y rol de WORKER
+        barber_profile = Profile.objects.get(user_id=barber_id, role=Profile.Role.WORKER)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Barbero no encontrado o no válido.'}, status=404)
+
     booking = Booking.objects.create(
         user=request.user,
-        barber=request.barber_profile.user,
+        barber=barber_profile.user,
         service=service,
         date=date,
         time_slot=request.time_slot,
@@ -178,46 +184,72 @@ def delete_booking(request, booking_pk):
     return JsonResponse({'msg': 'Booking has been deleted'})
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
+@verify_token
 def get_available_dates(request):
     """
-    Devuelve las fechas disponibles para reservas.
+    Devuelve las fechas disponibles para reservas de un barbero específico.
 
-    Este endpoint permite a un usuario autenticado obtener las fechas
-    disponibles para hacer reservas, excluyendo los domingos y
-    considerando la disponibilidad de los barberos.
+    Parámetros GET:
+    - barber_id: ID del barbero para filtrar (requerido)
 
     :param request: Objeto de solicitud HTTP.
-    :return: JsonResponse con las fechas y horarios disponibles para cada barbero.
+    :return: JsonResponse con las fechas y horarios disponibles para el barbero especificado.
     """
+    barber_id = request.GET.get('barber_id')
+
+    if not barber_id:
+        return JsonResponse({'error': 'El parámetro barber_id es requerido'}, status=400)
+
+    try:
+        barber = User.objects.get(id=barber_id, profile__role=Profile.Role.WORKER)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Barbero no encontrado'}, status=404)
+
     now = timezone.now()
     today = now.date()
     start_date = today
     days_until_saturday = 5 - today.weekday()
+
     if days_until_saturday < 0:
         return JsonResponse({})
+
     end_date = today + timedelta(days=days_until_saturday)
-    barbers = User.objects.filter(profile__role=Profile.Role.WORKER)
+
     available_slots = {}
-    for barber in barbers:
-        available_slots[barber.username] = {}
-        current_date = start_date
-        while current_date <= end_date:
-            if current_date.weekday() == 6:
-                current_date += timedelta(days=1)
-                continue
-            time_slots = TimeSlot.objects.all()
-            booked_slots = Booking.objects.filter(barber=barber, date=current_date).values_list(
-                'time_slot', flat=True
-            )
-            available_time_slots = time_slots.exclude(id__in=booked_slots)
-            if current_date == today:
-                available_time_slots = available_time_slots.filter(start_time__gt=now.time())
-            available_slots[barber.username][current_date.isoformat()] = [
-                {'id': slot.id, 'start_time': slot.start_time, 'end_time': slot.end_time}
-                for slot in available_time_slots
-            ]
+    current_date = start_date
+
+    while current_date <= end_date:
+        if current_date.weekday() == 6:
             current_date += timedelta(days=1)
-    return JsonResponse(available_slots)
+            continue
+
+        time_slots = TimeSlot.objects.all()
+        booked_slots = Booking.objects.filter(barber=barber, date=current_date).values_list(
+            'time_slot', flat=True
+        )
+
+        available_time_slots = time_slots.exclude(id__in=booked_slots)
+
+        if current_date == today:
+            available_time_slots = available_time_slots.filter(start_time__gt=now.time())
+
+        available_slots[current_date.isoformat()] = [
+            {
+                'id': slot.id,
+                'start_time': slot.start_time.strftime('%H:%M'),
+                'end_time': slot.end_time.strftime('%H:%M'),
+            }
+            for slot in available_time_slots
+        ]
+
+        current_date += timedelta(days=1)
+
+    return JsonResponse(
+        {
+            'barber_id': barber.id,
+            'barber_name': barber.get_full_name() or barber.username,
+            'available_dates': available_slots,
+        }
+    )

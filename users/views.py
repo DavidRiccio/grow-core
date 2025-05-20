@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from shared.decorators import required_method
+from shared.decorators import required_method, verify_token
 
 from .models import Profile
 from .serializers import ProfileSerializer
@@ -29,9 +29,9 @@ def get_user_profile(request):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
+@verify_token
 def get_barbers(request):
     """
     Devuelve una lista de barberos.

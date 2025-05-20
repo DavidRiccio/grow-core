@@ -38,7 +38,6 @@ def order_detail(request, order_pk: int):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body

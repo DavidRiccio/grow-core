@@ -32,33 +32,18 @@ def verify_booking(func):
 
 
 def validate_barber_and_timeslot_existence(view_func):
-    """
-    Decorador que valida la existencia del barbero y del bloque horario (time slot) en los datos de la solicitud.
-
-    - Verifica que el barbero especificado por ID exista y tenga el rol 'W' (barbero).
-    - Verifica que el bloque horario (time slot) exista.
-
-    Si alguno de los datos no es válido, devuelve una respuesta JSON con el error correspondiente.
-
-    Si ambos existen, se adjuntan al objeto request como 'request.barber_profile' y 'request.time_slot'.
-
-    Args:
-        view_func (callable): Vista a decorar.
-
-    Returns:
-        callable: Vista decorada con validación de barbero y horario.
-    """
-
     def wrapper(request, *args, **kwargs):
         data = request.json_body
 
+        # Validar existencia del barbero
         try:
-            request.barber_profile = Profile.objects.get(pk=data['barber'])
-            if request.barber_profile.role != 'W':
+            request.barber_profile = Profile.objects.get(user_id=data['barber'])
+            if request.barber_profile.role != Profile.Role.WORKER:
                 return JsonResponse({'error': 'The user is not a Barber'}, status=400)
         except Profile.DoesNotExist:
             return JsonResponse({'error': 'Barber not found'}, status=404)
 
+        # Validar existencia del time slot
         try:
             request.time_slot = TimeSlot.objects.get(pk=data['time_slot'])
         except TimeSlot.DoesNotExist:
