@@ -1,3 +1,4 @@
+# bookings/apps.py
 from django.apps import AppConfig
 
 
@@ -6,4 +7,4 @@ class BookingsConfig(AppConfig):
     name = 'bookings'
 
     def ready(self):
-        pass  # Asegúrate de que las señales se registren cuando se inicie la aplicación
+        import bookings.signals  # noqa: F401

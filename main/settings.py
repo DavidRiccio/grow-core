@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'bookings.apps.BookingsConfig',
     'corsheaders',
+    'django_rq',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -131,6 +132,14 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'redis',  # Nombre del servicio en docker-compose.yml
+        'PORT': 6379,
+        'DB': 0,
+        'DEFAULT_TIMEOUT': 360,
+    }
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
@@ -138,3 +147,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOW_ALL_ORIGINS = True
 TELEGRAM_BOT_TOKEN = '7480598750:AAGk3gjDP20qoGZmlwg7Xo1re2b3OOGl4Jk'
 ADMIN_CHAT_ID = 1920633138
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'grow.testing.daw@gmail.com'
+EMAIL_HOST_PASSWORD = 'wtqwosljrrzdayje'
+
+# Reemplaza /ruta/a/tu/proyecto con la ruta real
