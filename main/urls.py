@@ -29,6 +29,7 @@ urlpatterns = [
     path('logout/', accounts.views.user_logout, name='logout'),
     path('signup/', accounts.views.user_signup, name='signup'),
     path('api/user/', users.views.get_user_profile, name='user'),
+    path('api/users-per-mounth/', users.views.users_per_mounth, name='users-per-mounth'),
     path('api/barbers/', users.views.get_barbers, name='barber'),
     path('api/bookings/', include('bookings.urls')),
     path('api/products/', include('products.urls')),

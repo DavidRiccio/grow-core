@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from products.models import Product
@@ -9,6 +10,7 @@ from shared.decorators import (
     load_json_body,
     required_fields,
     required_method,
+    verify_admin,
     verify_token,
 )
 
@@ -164,3 +166,31 @@ def cancell_order(request, order_pk: int):
     request.order.status = Order.Status.CANCELLED
     request.order.save()
     return JsonResponse({'msg': f'Order {order_pk} has been cancelled'})
+
+
+@csrf_exempt
+@required_method('GET')
+@verify_token
+@verify_admin
+def get_earnings(request):
+    now = timezone.now()
+    first_day_of_month = now.replace(day=1)
+    last_day_of_month = (first_day_of_month + timezone.timedelta(days=31)).replace(
+        day=1
+    ) - timezone.timedelta(days=1)
+    total_earnings = []
+    labels = []
+    for day in range(1, last_day_of_month.day + 1):
+        date = first_day_of_month.replace(day=day)
+        orders = Order.objects.filter(created_at__date=date, status=Order.Status.COMPLETED)
+        earnings = 0
+        for order in orders:
+            earnings += order.price
+        total_earnings.append(earnings)
+        labels.append(date.strftime('%Y-%m-%d'))
+    return JsonResponse(
+        {
+            'labels': labels,
+            'values': total_earnings,
+        }
+    )

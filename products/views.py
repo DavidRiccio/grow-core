@@ -15,7 +15,6 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
-@csrf_exempt
 @required_method('GET')
 def product_list(request):
     """

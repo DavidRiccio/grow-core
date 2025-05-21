@@ -283,3 +283,31 @@ def get_available_dates(request):
             'available_dates': available_slots,
         }
     )
+
+
+@csrf_exempt
+@required_method('GET')
+@verify_token
+@verify_admin
+def get_earnings(request):
+    now = timezone.now()
+    first_day_of_month = now.replace(day=1)
+    last_day_of_month = (first_day_of_month + timezone.timedelta(days=31)).replace(
+        day=1
+    ) - timezone.timedelta(days=1)
+    total_earnings = []
+    labels = []
+    for day in range(1, last_day_of_month.day + 1):
+        date = first_day_of_month.replace(day=day)
+        bookings = Booking.objects.filter(created_at__date=date, status=Booking.Status.CONFIRMED)
+        earnings = 0
+        for booking in bookings:
+            earnings += booking.service.price
+        total_earnings.append(earnings)
+        labels.append(date.strftime('%Y-%m-%d'))
+    return JsonResponse(
+        {
+            'labels': labels,
+            'values': total_earnings,
+        }
+    )

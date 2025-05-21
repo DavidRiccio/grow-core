@@ -1,5 +1,9 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum
+from django.utils.timezone import now
 
 
 class Order(models.Model):
@@ -78,3 +82,41 @@ class Order(models.Model):
         """
         self.products.add(product)
         self.save()
+
+    @classmethod
+    def earnings_summary(cls):
+        """
+        Calcula los ingresos totales por órdenes completadas en distintos periodos.
+
+        Returns
+        -------
+        dict
+            Diccionario con las llaves `'daily'`, `'weekly'` y `'monthly'` indicando
+            el total de ingresos en cada periodo.
+        """
+        today = now().date()
+        start_week = today - timedelta(days=today.weekday())
+        start_month = today.replace(day=1)
+
+        daily = (
+            cls.objects.filter(created_at=today, status=cls.Status.COMPLETED).aggregate(
+                total=Sum('price')
+            )['total']
+            or 0
+        )
+
+        weekly = (
+            cls.objects.filter(
+                created_at__gte=start_week, created_at__lte=today, status=cls.Status.COMPLETED
+            ).aggregate(total=Sum('price'))['total']
+            or 0
+        )
+
+        monthly = (
+            cls.objects.filter(
+                created_at__gte=start_month, created_at__lte=today, status=cls.Status.COMPLETED
+            ).aggregate(total=Sum('price'))['total']
+            or 0
+        )
+
+        return {'daily': daily, 'weekly': weekly, 'monthly': monthly}
