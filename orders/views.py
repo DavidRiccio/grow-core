@@ -24,15 +24,21 @@ from .serializers import OrderSerializer
 @verify_user
 def order_detail(request, order_pk: int):
     """
-    Devuelve los detalles de un pedido específico.
+    Recupera los detalles de un pedido específico.
 
-    Este endpoint permite a un usuario autenticado obtener los detalles de un pedido
-    utilizando su ID. Solo se puede acceder a este endpoint si el pedido existe y
-    pertenece al usuario.
+    Este endpoint permite a un usuario autenticado obtener la información de una orden,
+    validando que el pedido exista y que pertenezca al usuario que realiza la solicitud.
+
+    Decoradores aplicados:
+        - login_required: Verifica que el usuario esté autenticado.
+        - csrf_exempt: Exime de la verificación CSRF.
+        - required_method('GET'): Restringe el método HTTP a GET.
+        - verify_order: Carga la orden en request.order si existe.
+        - verify_user: Verifica que el usuario autenticado sea el propietario de la orden.
 
     :param request: Objeto de solicitud HTTP.
-    :param order_pk: ID del pedido.
-    :return: JsonResponse con los detalles del pedido.
+    :param order_pk: ID de la orden a recuperar.
+    :return: JsonResponse con los datos serializados de la orden.
     """
     serializer = OrderSerializer(request.order, request=request)
     return serializer.json_response()
@@ -44,14 +50,20 @@ def order_detail(request, order_pk: int):
 @verify_token
 def add_order(request):
     """
-    Agrega un nuevo pedido.
+    Crea una nueva orden de pedido.
 
-    Este endpoint permite a un usuario autenticado crear un nuevo pedido
-    proporcionando los productos y sus cantidades. Se verifica la disponibilidad
-    de stock antes de completar el pedido.
+    Este endpoint permite a un usuario autenticado generar una orden,
+    siempre que exista suficiente stock para los productos solicitados.
+    Calcula el precio total y actualiza el stock de los productos.
 
-    :param request: Objeto de solicitud HTTP que contiene los datos del pedido.
-    :return: JsonResponse con el ID del nuevo pedido creado o un error si hay problemas con el stock.
+    Decoradores aplicados:
+        - csrf_exempt: Exime de la verificación CSRF.
+        - required_method('POST'): Restringe el método HTTP a POST.
+        - load_json_body: Carga el cuerpo de la solicitud como JSON.
+        - verify_token: Verifica que el token de autenticación sea válido.
+
+    :param request: Objeto de solicitud HTTP con los datos de productos.
+    :return: JsonResponse con el ID de la orden creada o un mensaje de error.
     """
     order_data = request.json_body
     order = Order(user=request.user)
@@ -87,15 +99,25 @@ def add_order(request):
 @validate_status
 def pay_order(request, order_pk: int):
     """
-    Procesa el pago de un pedido.
+    Procesa el pago de una orden.
 
-    Este endpoint permite a un usuario autenticado completar el pago de un pedido
-    utilizando la información de la tarjeta de crédito. Cambia el estado del pedido a
-    "COMPLETADO".
+    Cambia el estado de la orden a 'COMPLETED' si se valida correctamente la tarjeta.
+    Solo se puede pagar una orden válida, pendiente y propiedad del usuario autenticado.
 
-    :param request: Objeto de solicitud HTTP que contiene los datos de pago.
-    :param order_pk: ID del pedido a pagar.
-    :return: JsonResponse con un mensaje de éxito.
+    Decoradores aplicados:
+        - csrf_exempt: Exime de la verificación CSRF.
+        - required_method('POST'): Restringe el método HTTP a POST.
+        - load_json_body: Carga el cuerpo de la solicitud como JSON.
+        - required_fields: Verifica la presencia de campos de pago.
+        - verify_token: Verifica el token JWT del usuario.
+        - verify_order: Carga la orden si existe.
+        - validate_credit_card: Valida los campos de la tarjeta.
+        - verify_user: Verifica que el usuario sea el dueño de la orden.
+        - validate_status: Verifica que la orden esté en estado 'PENDING'.
+
+    :param request: Objeto de solicitud HTTP con los datos de pago.
+    :param order_pk: ID de la orden a pagar.
+    :return: JsonResponse con un mensaje de confirmación.
     """
     request.order.status = Order.Status.COMPLETED
     request.order.save()
@@ -111,15 +133,23 @@ def pay_order(request, order_pk: int):
 @validate_status
 def cancell_order(request, order_pk: int):
     """
-    Cancela un pedido existente.
+    Cancela una orden de pedido.
 
-    Este endpoint permite a un usuario autenticado cancelar un pedido.
-    Se restablece el stock de los productos del pedido y se cambia el estado
-    del pedido a "CANCELADO".
+    Cambia el estado de la orden a 'CANCELLED' y repone el stock de los productos involucrados.
+    Solo se puede cancelar una orden válida, pendiente y propiedad del usuario.
 
-    :param request: Objeto de solicitud HTTP que contiene los datos del pedido.
-    :param order_pk: ID del pedido a cancelar.
-    :return: JsonResponse con un mensaje de éxito o un error si hay problemas con los productos.
+    Decoradores aplicados:
+        - csrf_exempt: Exime de la verificación CSRF.
+        - required_method('POST'): Restringe el método HTTP a POST.
+        - load_json_body: Carga el cuerpo de la solicitud como JSON.
+        - verify_token: Verifica el token JWT del usuario.
+        - verify_order: Carga la orden si existe.
+        - verify_user: Verifica que el usuario sea el dueño de la orden.
+        - validate_status: Verifica que la orden no esté ya cancelada o completada.
+
+    :param request: Objeto de solicitud HTTP con los productos a devolver.
+    :param order_pk: ID de la orden a cancelar.
+    :return: JsonResponse con un mensaje de éxito o de error si falla.
     """
     order_data = request.json_body
     for item in order_data['products']:

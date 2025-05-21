@@ -12,8 +12,15 @@ def verify_service(func):
     se asigna al objeto de solicitud. Si no se encuentra el servicio, se devuelve
     un error 404.
 
-    :param func: La función a la que se aplica el decorador.
-    :return: Función envuelta que verifica la existencia del servicio.
+    Parameters
+    ----------
+    func : callable
+        La función a la que se aplica el decorador.
+
+    Returns
+    -------
+    callable
+        Función envuelta que verifica la existencia del servicio.
     """
 
     def wrapper(request, *args, **kwargs):
@@ -22,6 +29,6 @@ def verify_service(func):
             request.service = service
             return func(request, *args, **kwargs)
         except Service.DoesNotExist:
-            return JsonResponse({'error': 'Service not found'}, status=404)
+            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
 
     return wrapper

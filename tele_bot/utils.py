@@ -7,7 +7,24 @@ BASE_URL = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/'
 
 
 def send_message(chat_id, text):
-    """Envía un mensaje al chat de Telegram"""
+    """
+    Envía un mensaje al chat de Telegram.
+
+    Este método utiliza la API de Telegram para enviar un mensaje al
+    chat especificado por el ID.
+
+    Parameters
+    ----------
+    chat_id : int
+        El ID del chat al que se enviará el mensaje.
+    text : str
+        El texto del mensaje que se enviará.
+
+    Returns
+    -------
+    dict
+        Respuesta JSON de la API de Telegram con los detalles del mensaje enviado.
+    """
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
     params = {'chat_id': chat_id, 'text': text}
 
@@ -25,7 +42,17 @@ def send_message(chat_id, text):
 
 
 def get_updates():
-    """Obtiene los mensajes recientes que el bot ha recibido"""
+    """
+    Obtiene los mensajes recientes que el bot ha recibido.
+
+    Este método utiliza la API de Telegram para recuperar las actualizaciones
+    (mensajes) que han sido enviados al bot.
+
+    Returns
+    -------
+    dict
+        Respuesta JSON de la API de Telegram con las actualizaciones recibidas.
+    """
     url = BASE_URL + 'getUpdates'
     response = requests.get(url)
     return response.json()

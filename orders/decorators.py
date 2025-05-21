@@ -8,21 +8,24 @@ from .models import Order
 
 def verify_user(func):
     """
-    Decorador que verifica si el usuario autenticado es el propietario de la orden.
+    Verifica que el usuario autenticado sea el propietario de la orden.
 
-    Si el usuario que realiza la solicitud no es el dueño de la orden especificada en 'order_pk',
-    se devuelve una respuesta JSON con error 403 (Forbidden).
+    Si el usuario que realiza la solicitud no es el propietario de la orden
+    especificada en `order_pk`, se devuelve una respuesta con error 403 (Forbidden).
 
-    Args:
-        func (callable): Vista a decorar.
+    Parameters
+    ----------
+    func : callable
+        Vista a decorar.
 
-    Returns:
-        callable: Vista decorada que incluye la verificación del usuario.
+    Returns
+    -------
+    callable
+        Vista decorada que incluye la verificación de propiedad del usuario.
     """
 
     def wrapper(request, *args, **kwargs):
         order = Order.objects.get(pk=kwargs['order_pk'])
-
         if order.user != request.user:
             return JsonResponse({'error': 'User is not the owner of requested order'}, status=403)
         return func(request, *args, **kwargs)
@@ -32,16 +35,19 @@ def verify_user(func):
 
 def verify_order(func):
     """
-    Decorador que intenta recuperar la orden según el 'order_pk' de la URL.
+    Verifica si la orden especificada por `order_pk` existe.
 
-    Si la orden existe, se adjunta al objeto request como 'request.order'.
-    Si no existe, devuelve una respuesta JSON con error 404 (Not Found).
+    Si existe, se asigna a `request.order`; de lo contrario, se retorna un error 404.
 
-    Args:
-        func (callable): Vista a decorar.
+    Parameters
+    ----------
+    func : callable
+        Vista a decorar.
 
-    Returns:
-        callable: Vista decorada que incluye la verificación de existencia de la orden.
+    Returns
+    -------
+    callable
+        Vista decorada con la validación de existencia de la orden.
     """
 
     def wrapper(request, *args, **kwargs):
@@ -57,17 +63,20 @@ def verify_order(func):
 
 def validate_credit_card(func):
     """
-    Decorador que valida los datos de la tarjeta de crédito enviados en el cuerpo JSON de la solicitud.
+    Valida los datos de la tarjeta de crédito enviados en la solicitud.
 
-    Verifica el formato del número de tarjeta, la fecha de expiración y el CVC.
-    También comprueba que la tarjeta no esté expirada.
-    Devuelve una respuesta JSON con error 400 si alguno de los campos es inválido.
+    Comprueba el formato del número de tarjeta, la fecha de expiración y el CVC.
+    También verifica que la tarjeta no esté expirada.
 
-    Args:
-        func (callable): Vista a decorar.
+    Parameters
+    ----------
+    func : callable
+        Vista a decorar.
 
-    Returns:
-        callable: Vista decorada que incluye la validación de la tarjeta de crédito.
+    Returns
+    -------
+    callable
+        Vista decorada que incluye la validación de los datos de la tarjeta.
     """
 
     def wrapper(request, *args, **kwargs):
@@ -94,18 +103,21 @@ def validate_credit_card(func):
 
 def validate_status(func):
     """
-    Decorador que valida el estado de una orden antes de permitir modificaciones.
+    Valida el estado actual de una orden antes de permitir cambios.
 
-    Si la orden tiene estado 'CANCELLED' o 'COMPLETED', devuelve un error 400 (Bad Request)
-    indicando que no se puede modificar la orden.
+    Impide modificar órdenes con estado `CANCELLED` o `COMPLETED`.
 
-    Requiere que 'request.order' esté definido (usualmente proporcionado por el decorador verify_order).
+    Requiere que `request.order` esté definido.
 
-    Args:
-        func (callable): Vista a decorar.
+    Parameters
+    ----------
+    func : callable
+        Vista a decorar.
 
-    Returns:
-        callable: Vista decorada con validación de estado de la orden.
+    Returns
+    -------
+    callable
+        Vista decorada que incluye la validación del estado de la orden.
     """
 
     def wrapper(request, *args, **kwargs):

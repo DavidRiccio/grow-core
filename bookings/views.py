@@ -39,8 +39,15 @@ def booking_list(request):
     Realiza una consulta a la base de datos para obtener todas las reservas
     y las serializa antes de devolverlas en una respuesta JSON.
 
-    :param request: Objeto de solicitud HTTP.
-    :return: JsonResponse con la lista de reservas.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con la lista de reservas.
     """
     bookings = Booking.objects.all()
     bookings_serializer = [BookingSerializer(booking).serialize() for booking in bookings]
@@ -62,8 +69,15 @@ def create_booking(request):
     proporcionando el servicio, el horario, la fecha y el barbero.
     Si el servicio no existe, devuelve un error.
 
-    :param request: Objeto de solicitud HTTP que contiene los datos de la reserva.
-    :return: JsonResponse con el ID de la nueva reserva o un error si el servicio no se encuentra.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP que contiene los datos de la reserva.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con el ID de la nueva reserva o un error si el servicio no se encuentra.
     """
     service_pk = request.json_body['service']
     barber_id = request.json_body['barber']
@@ -102,8 +116,15 @@ def earnings_summary(request):
     Este endpoint permite a los administradores obtener un resumen de las
     ganancias generadas por las reservas.
 
-    :param request: Objeto de solicitud HTTP.
-    :return: JsonResponse con el resumen de ganancias.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con el resumen de ganancias.
     """
     serializer = BookingEarningsSerializer(None, request=request)
     return serializer.json_response()
@@ -125,9 +146,17 @@ def edit_booking(request, booking_pk):
     Este endpoint permite a un usuario autenticado editar una reserva
     existente proporcionando el nuevo servicio, horario, fecha y barbero.
 
-    :param request: Objeto de solicitud HTTP que contiene los datos de la reserva.
-    :param booking_pk: ID de la reserva a editar.
-    :return: JsonResponse con un mensaje de éxito.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP que contiene los datos de la reserva.
+    booking_pk : int
+        ID de la reserva a editar.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con un mensaje de éxito.
     """
     service_pk = request.json_body['service']
     date = request.json_body['date']
@@ -141,7 +170,7 @@ def edit_booking(request, booking_pk):
     booking.time_slot = request.time_slot
     booking.save()
 
-    return JsonResponse({'msg': 'Booking has been edited'})
+    return JsonResponse({'msg': 'La reserva ha sido editada'})
 
 
 @login_required
@@ -155,9 +184,17 @@ def booking_detail(request, booking_pk):
     Este endpoint permite a un usuario autenticado obtener los detalles
     de una reserva específica utilizando su ID.
 
-    :param request: Objeto de solicitud HTTP.
-    :param booking_pk: ID de la reserva.
-    :return: JsonResponse con los detalles de la reserva.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP.
+    booking_pk : int
+        ID de la reserva.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con los detalles de la reserva.
     """
     booking = request.booking
     serializer = BookingSerializer(booking, request=request)
@@ -176,13 +213,21 @@ def delete_booking(request, booking_pk):
     Este endpoint permite a un usuario autenticado eliminar una reserva
     específica utilizando su ID.
 
-    :param request: Objeto de solicitud HTTP.
-    :param booking_pk: ID de la reserva a eliminar.
-    :return: JsonResponse con un mensaje de éxito.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP.
+    booking_pk : int
+        ID de la reserva a eliminar.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con un mensaje de éxito.
     """
     booking = request.booking
     booking.delete()
-    return JsonResponse({'msg': 'Booking has been deleted'})
+    return JsonResponse({'msg': 'La reserva ha sido eliminada'})
 
 
 @csrf_exempt
@@ -195,8 +240,15 @@ def get_available_dates(request):
     Parámetros GET:
     - barber_id: ID del barbero para filtrar (requerido)
 
-    :param request: Objeto de solicitud HTTP.
-    :return: JsonResponse con las fechas y horarios disponibles para el barbero especificado.
+    Parameters
+    ----------
+    request : HttpRequest
+        Objeto de solicitud HTTP.
+
+    Returns
+    -------
+    JsonResponse
+        Respuesta JSON con las fechas y horarios disponibles para el barbero especificado.
     """
     barber_id = request.GET.get('barber_id')
 

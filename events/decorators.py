@@ -8,13 +8,17 @@ def verify_event(func):
     Decorador que intenta recuperar un evento usando 'event_pk' desde los parámetros de la URL.
 
     Si el evento existe, se adjunta al objeto request como 'request.event'.
-    Si no existe, devuelve una respuesta JSON con error 404 (Not Found).
+    Si no existe, devuelve una respuesta JSON con error 404 (No encontrado).
 
-    Args:
-        func (callable): Vista a decorar.
+    Parameters
+    ----------
+    func : callable
+        Vista a decorar.
 
-    Returns:
-        callable: Vista decorada que incluye la verificación de existencia del evento.
+    Returns
+    -------
+    callable
+        Vista decorada que incluye la verificación de existencia del evento.
     """
 
     def wrapper(request, *args, **kwargs):
@@ -22,7 +26,7 @@ def verify_event(func):
             event = Event.objects.get(id=kwargs['event_pk'])
             request.event = event
         except Event.DoesNotExist:
-            return JsonResponse({'error': 'Event not found'}, status=404)
+            return JsonResponse({'error': 'Evento no encontrado'}, status=404)
 
         return func(request, *args, **kwargs)
 

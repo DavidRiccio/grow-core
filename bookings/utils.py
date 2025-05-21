@@ -5,10 +5,23 @@ def get_available_time_slots(barber, date, current_time=None):
     """
     Obtiene los horarios disponibles para un barbero en una fecha específica.
 
-    :param barber: Instancia del barbero.
-    :param date: Fecha para la que se buscan los horarios.
-    :param current_time: Hora actual, utilizada para excluir horarios pasados (opcional).
-    :return: Lista de horarios disponibles.
+    Parameters
+    ----------
+    barber : Barber
+        Instancia del barbero.
+    date : datetime.date
+        Fecha para la que se buscan los horarios.
+    current_time : datetime.time, opcional
+        Hora actual, utilizada para excluir horarios pasados.
+
+    Returns
+    -------
+    list of dict
+        Lista de horarios disponibles, donde cada horario es un diccionario
+        que contiene las siguientes claves:
+            - id : int
+            - start_time : str
+            - end_time : str
     """
     time_slots = TimeSlot.objects.all()
     booked_slots = Booking.objects.filter(barber=barber, date=date).values_list(
@@ -33,7 +46,14 @@ def is_working_day(date):
     """
     Determina si una fecha es día laboral (excluye domingos).
 
-    :param date: Fecha a evaluar.
-    :return: True si es día laboral, False en caso contrario.
+    Parameters
+    ----------
+    date : datetime.date
+        Fecha a evaluar.
+
+    Returns
+    -------
+    bool
+        True si es día laboral, False en caso contrario.
     """
     return date.weekday() != 6  # Excluye domingos.
