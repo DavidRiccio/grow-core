@@ -35,7 +35,6 @@ def validate_barber_and_timeslot_existence(view_func):
     def wrapper(request, *args, **kwargs):
         data = request.json_body
 
-        # Validar existencia del barbero
         try:
             request.barber_profile = Profile.objects.get(user_id=data['barber'])
             if request.barber_profile.role != Profile.Role.WORKER:
@@ -43,7 +42,6 @@ def validate_barber_and_timeslot_existence(view_func):
         except Profile.DoesNotExist:
             return JsonResponse({'error': 'Barber not found'}, status=404)
 
-        # Validar existencia del time slot
         try:
             request.time_slot = TimeSlot.objects.get(pk=data['time_slot'])
         except TimeSlot.DoesNotExist:

@@ -21,8 +21,9 @@ from .decorators import (
     validate_barber_availability,
     verify_booking,
 )
-from .models import Booking, TimeSlot
+from .models import Booking
 from .serializers import BookingEarningsSerializer, BookingSerializer
+from .utils import get_available_time_slots, is_working_day
 
 User = get_user_model()
 
@@ -210,40 +211,17 @@ def get_available_dates(request):
     now = timezone.now()
     today = now.date()
     start_date = today
-    days_until_saturday = 5 - today.weekday()
-
-    if days_until_saturday < 0:
-        return JsonResponse({})
-
-    end_date = today + timedelta(days=days_until_saturday)
+    end_date = today + timedelta(days=13)  # 14 días desde hoy, incluyendo hoy.
 
     available_slots = {}
     current_date = start_date
 
     while current_date <= end_date:
-        if current_date.weekday() == 6:
-            current_date += timedelta(days=1)
-            continue
-
-        time_slots = TimeSlot.objects.all()
-        booked_slots = Booking.objects.filter(barber=barber, date=current_date).values_list(
-            'time_slot', flat=True
-        )
-
-        available_time_slots = time_slots.exclude(id__in=booked_slots)
-
-        if current_date == today:
-            available_time_slots = available_time_slots.filter(start_time__gt=now.time())
-
-        available_slots[current_date.isoformat()] = [
-            {
-                'id': slot.id,
-                'start_time': slot.start_time.strftime('%H:%M'),
-                'end_time': slot.end_time.strftime('%H:%M'),
-            }
-            for slot in available_time_slots
-        ]
-
+        if is_working_day(current_date):
+            current_time = now.time() if current_date == today else None
+            available_slots[current_date.isoformat()] = get_available_time_slots(
+                barber, current_date, current_time
+            )
         current_date += timedelta(days=1)
 
     return JsonResponse(

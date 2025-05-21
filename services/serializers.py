@@ -10,5 +10,5 @@ class ServiceSerializer(BaseSerializer):
             'duration': instance.duration,
             'price': str(instance.price),
             'created_at': instance.created_at,
-            'image': f'{self.build_url(instance.image.url)}',
+            'image': f'http://localhost:8000{self.build_url(instance.image.url)}',
         }
