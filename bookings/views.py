@@ -200,7 +200,6 @@ def cancel_booking(request, booking_pk):
         Respuesta JSON con un mensaje de éxito.
     """
     booking = request.booking
-    booking.status = Booking.Status.CANCELLED
     booking.delete()
     return JsonResponse({'msg': 'La reserva ha sido cancelada'})
 
