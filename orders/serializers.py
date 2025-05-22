@@ -46,5 +46,5 @@ class OrderSerializer(BaseSerializer):
             ).serialize(),
             'price': instance.price,
             'created_at': instance.created_at,
-            'status': instance.status,
+            'status': instance.get_status_display(),
         }

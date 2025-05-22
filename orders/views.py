@@ -19,6 +19,30 @@ from .models import Order
 from .serializers import OrderSerializer
 
 
+@csrf_exempt
+@required_method('GET')
+@verify_token
+def user_order_list(request):
+    """
+    Recupera los detalles de un pedido específico.
+
+    Este endpoint permite a un usuario autenticado obtener la información de una orden,
+    validando que el pedido exista y que pertenezca al usuario que realiza la solicitud.
+
+    Decoradores aplicados:
+        - csrf_exempt: Exime de la verificación CSRF.
+        - required_method('GET'): Restringe el método HTTP a GET.
+        - verify_user: Verifica que el usuario autenticado sea el propietario de la orden.
+
+    :param request: Objeto de solicitud HTTP.
+    :param order_pk: ID de la orden a recuperar.
+    :return: JsonResponse con los datos serializados de la orden.
+    """
+    orders = Order.objects.filter(user=request.user)
+    orders_serializer = [OrderSerializer(order).serialize() for order in orders]
+    return JsonResponse(orders_serializer, safe=False, status=200)
+
+
 @login_required
 @csrf_exempt
 @required_method('GET')

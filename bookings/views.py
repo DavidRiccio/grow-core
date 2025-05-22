@@ -22,21 +22,21 @@ from .decorators import (
     verify_booking,
 )
 from .models import Booking
-from .serializers import BookingEarningsSerializer, BookingSerializer
+from .serializers import BookingSerializer
 from .utils import get_available_time_slots, is_working_day
 
 User = get_user_model()
 
 
-@login_required
 @csrf_exempt
 @required_method('GET')
-def booking_list(request):
+@verify_token
+def user_booking_list(request):
     """
-    Devuelve una lista de todas las reservas en formato JSON.
+    Devuelve una lista de todas las reservas de usuario en formato JSON.
 
     Este endpoint requiere que el usuario esté autenticado.
-    Realiza una consulta a la base de datos para obtener todas las reservas
+    Realiza una consulta a la base de datos para obtener todas las reservas de un usuario
     y las serializa antes de devolverlas en una respuesta JSON.
 
     Parameters
@@ -49,7 +49,7 @@ def booking_list(request):
     JsonResponse
         Respuesta JSON con la lista de reservas.
     """
-    bookings = Booking.objects.all()
+    bookings = Booking.objects.filter(user=request.user)
     bookings_serializer = [BookingSerializer(booking).serialize() for booking in bookings]
     return JsonResponse(bookings_serializer, safe=False, status=200)
 
@@ -103,31 +103,6 @@ def create_booking(request):
     )
 
     return JsonResponse({'id': booking.pk})
-
-
-@login_required
-@csrf_exempt
-@required_method('GET')
-@verify_admin
-def earnings_summary(request):
-    """
-    Devuelve un resumen de las ganancias.
-
-    Este endpoint permite a los administradores obtener un resumen de las
-    ganancias generadas por las reservas.
-
-    Parameters
-    ----------
-    request : HttpRequest
-        Objeto de solicitud HTTP.
-
-    Returns
-    -------
-    JsonResponse
-        Respuesta JSON con el resumen de ganancias.
-    """
-    serializer = BookingEarningsSerializer(None, request=request)
-    return serializer.json_response()
 
 
 @login_required
@@ -201,16 +176,15 @@ def booking_detail(request, booking_pk):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @verify_token
 @verify_booking
-def delete_booking(request, booking_pk):
+def cancel_booking(request, booking_pk):
     """
-    Elimina una reserva existente.
+    Cancela una reserva existente.
 
-    Este endpoint permite a un usuario autenticado eliminar una reserva
+    Este endpoint permite a un usuario autenticado Cancela una reserva
     específica utilizando su ID.
 
     Parameters
@@ -218,7 +192,7 @@ def delete_booking(request, booking_pk):
     request : HttpRequest
         Objeto de solicitud HTTP.
     booking_pk : int
-        ID de la reserva a eliminar.
+        ID de la reserva a Cancelar.
 
     Returns
     -------
@@ -226,8 +200,9 @@ def delete_booking(request, booking_pk):
         Respuesta JSON con un mensaje de éxito.
     """
     booking = request.booking
-    booking.delete()
-    return JsonResponse({'msg': 'La reserva ha sido eliminada'})
+    booking.status = Booking.Status.CANCELLED
+    booking.save()
+    return JsonResponse({'msg': 'La reserva ha sido cancelada'})
 
 
 @csrf_exempt
