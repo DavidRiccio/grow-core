@@ -47,7 +47,7 @@ class BookingSerializer(BaseSerializer):
             ),
             'barber': instance.barber.get_full_name(),
             'barber_id': instance.barber.id,
-            'status': instance.status,
+            'status': instance.get_status_display(),
             'created_at': instance.created_at,
         }
 
