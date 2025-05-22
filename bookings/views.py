@@ -265,21 +265,49 @@ def get_available_dates(request):
 @verify_token
 @verify_admin
 def get_earnings(request):
+    """
+    Obtiene las ganancias diarias del mes actual basadas en reservas confirmadas.
+
+    Esta vista recorre cada día del mes actual y calcula el total de ingresos generados
+    por las reservas confirmadas (status = CONFIRMED). Las ganancias se determinan
+    a partir del precio del servicio asociado a cada reserva.
+
+    Parámetros
+    ----------
+    request : HttpRequest
+        La solicitud HTTP entrante. Debe ser de tipo GET y debe incluir un token de autenticación válido.
+        Solo accesible por usuarios con permisos de administrador.
+
+    Retorna
+    -------
+    JsonResponse
+        Un objeto JSON con:
+            - 'labels': Lista de fechas (str) en formato 'YYYY-MM-DD'.
+            - 'values': Lista de floats representando las ganancias totales por día.
+
+    Ejemplo
+    -------
+    {
+        "labels": ["2025-05-01", "2025-05-02", ..., "2025-05-31"],
+        "values": [100.0, 75.5, ..., 120.0]
+    }
+    """
     now = timezone.now()
     first_day_of_month = now.replace(day=1)
     last_day_of_month = (first_day_of_month + timezone.timedelta(days=31)).replace(
         day=1
     ) - timezone.timedelta(days=1)
+
     total_earnings = []
     labels = []
+
     for day in range(1, last_day_of_month.day + 1):
         date = first_day_of_month.replace(day=day)
         bookings = Booking.objects.filter(created_at__date=date, status=Booking.Status.CONFIRMED)
-        earnings = 0
-        for booking in bookings:
-            earnings += booking.service.price
+        earnings = sum(booking.service.price for booking in bookings)
         total_earnings.append(earnings)
         labels.append(date.strftime('%Y-%m-%d'))
+
     return JsonResponse(
         {
             'labels': labels,

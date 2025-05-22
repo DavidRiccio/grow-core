@@ -43,18 +43,48 @@ def get_user_profile(request):
 @verify_token
 @verify_admin
 def users_per_mounth(request):
+    """
+    Obtiene la cantidad de usuarios registrados por día durante el mes actual.
+
+    Esta vista recorre cada día del mes actual y cuenta cuántos perfiles de usuario
+    fueron creados en cada fecha. La información se devuelve como una respuesta JSON
+    con etiquetas de fecha y los respectivos conteos diarios.
+
+    Parámetros
+    ----------
+    request : HttpRequest
+        Solicitud HTTP entrante. Debe ser de tipo GET y autenticada con token válido.
+        Requiere privilegios de administrador.
+
+    Retorna
+    -------
+    JsonResponse
+        Un objeto JSON con:
+            - 'labels': Lista de fechas (str) en formato 'YYYY-MM-DD'.
+            - 'values': Lista de enteros representando la cantidad de usuarios creados ese día.
+
+    Ejemplo
+    -------
+    {
+        "labels": ["2025-05-01", "2025-05-02", ..., "2025-05-31"],
+        "values": [2, 5, ..., 1]
+    }
+    """
     now = timezone.now()
     first_day_of_month = now.replace(day=1)
     last_day_of_month = (first_day_of_month + timezone.timedelta(days=31)).replace(
         day=1
     ) - timezone.timedelta(days=1)
+
     user_counts = []
     labels = []
+
     for day in range(1, last_day_of_month.day + 1):
         date = first_day_of_month.replace(day=day)
         count = Profile.objects.filter(created_at__date=date).count()
         user_counts.append(count)
         labels.append(date.strftime('%Y-%m-%d'))
+
     return JsonResponse(
         {
             'labels': labels,

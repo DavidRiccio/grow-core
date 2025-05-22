@@ -197,21 +197,50 @@ def cancel_order(request, order_pk: int):
 @verify_token
 @verify_admin
 def get_earnings(request):
+    """
+    Obtiene las ganancias diarias del mes actual para todas las órdenes completadas.
+
+    Esta vista calcula las ganancias totales por día desde el primer hasta el último día
+    del mes actual, considerando únicamente las órdenes con estado 'COMPLETED'. Retorna
+    una respuesta JSON con dos listas: fechas y valores correspondientes a las ganancias de cada día.
+
+    Parámetros
+    ----------
+    request : HttpRequest
+        La solicitud HTTP entrante. Debe ser de tipo GET y debe incluir un token de autenticación válido.
+        Solo accesible por usuarios con permisos de administrador.
+
+    Retorna
+    -------
+    JsonResponse
+        Un objeto JSON con dos claves:
+            - 'labels': Lista de fechas (str) en formato 'YYYY-MM-DD'.
+            - 'values': Lista de ganancias (float) correspondientes a cada día del mes actual.
+
+    Ejemplo
+    -------
+    {
+        "labels": ["2025-05-01", "2025-05-02", ..., "2025-05-31"],
+        "values": [150.0, 200.0, ..., 175.5]
+    }
+    """
     now = timezone.now()
     first_day_of_month = now.replace(day=1)
     last_day_of_month = (first_day_of_month + timezone.timedelta(days=31)).replace(
         day=1
     ) - timezone.timedelta(days=1)
+
     total_earnings = []
     labels = []
+
     for day in range(1, last_day_of_month.day + 1):
         date = first_day_of_month.replace(day=day)
         orders = Order.objects.filter(created_at__date=date, status=Order.Status.COMPLETED)
-        earnings = 0
-        for order in orders:
-            earnings += order.price
+        earnings = sum(order.price for order in orders)
+
         total_earnings.append(earnings)
         labels.append(date.strftime('%Y-%m-%d'))
+
     return JsonResponse(
         {
             'labels': labels,
