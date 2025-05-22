@@ -157,7 +157,7 @@ def pay_order(request, order_pk: int):
 @verify_order
 @verify_user
 @validate_status
-def cancell_order(request, order_pk: int):
+def cancel_order(request, order_pk: int):
     """
     Cancela una orden de pedido.
 
