@@ -1,3 +1,7 @@
+import base64
+import uuid
+
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -87,16 +91,32 @@ def add_event(request):
     date = request.json_body['date']
     time = request.json_body['time']
     location = request.json_body['location']
+    image_base64 = request.json_body.get('image')
+
+    image_file = None
+    if image_base64:
+        try:
+            format_part, data_part = image_base64.split(',')
+            file_format = format_part.split('/')[1].split(';')[0]
+
+            image_data = base64.b64decode(data_part)
+
+            filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+            image_file = ContentFile(image_data, name=filename)
+
+        except Exception as e:
+            return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
 
     event = Event.objects.create(
         name=name,
         description=description,
-        date=date,
         location=location,
+        date=date,
+        image=image_file,
         time=time,
-        image=request.image,
     )
-    return JsonResponse({'id': event.pk})
+
+    return JsonResponse({'id': event.pk, 'msg': 'Servicio creado exitosamente'})
 
 
 @csrf_exempt
@@ -130,7 +150,20 @@ def edit_event(request, event_pk: int):
     event.date = request.json_body['date']
     event.location = request.json_body['location']
     event.time = request.json_body['time']
-    event.image = request.image
+    image_base64 = request.json_body.get('image')
+    if image_base64:
+        try:
+            format_part, data_part = image_base64.split(',')
+            file_format = format_part.split('/')[1].split(';')[0]
+
+            image_data = base64.b64decode(data_part)
+
+            filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+            image_file = ContentFile(image_data, name=filename)
+            event.image = image_file
+        except Exception as e:
+            return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
+
     event.save()
     return JsonResponse({'msg': 'Event has been edited'})
 

@@ -1,3 +1,7 @@
+import base64
+import uuid
+
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -67,36 +71,49 @@ def service_detail(request, service_pk):
 @csrf_exempt
 @required_method('POST')
 @load_json_body
-@required_fields('name', 'description', 'price', 'duration', model=Service)
 @verify_token
 @verify_admin
 def add_service(request):
     """
-    Agrega un nuevo servicio.
-
-    Este endpoint permite a un administrador autenticado crear un nuevo servicio
-    proporcionando el nombre, descripción, precio y duración del servicio.
-
-    Parameters
-    ----------
-    request : HttpRequest
-        Objeto de solicitud HTTP que contiene los datos del nuevo servicio.
-
-    Returns
-    -------
-    JsonResponse
-        Respuesta JSON con el ID del nuevo servicio creado.
+    Agrega un nuevo servicio usando JSON con imágenes en base64.
     """
-    name = request.json_body['name']
-    description = request.json_body['description']
-    price = request.json_body['price']
-    duration = request.json_body['duration']
-    duration = Service.convert_duration_string(duration)
+    try:
+        name = request.json_body.get('name')
+        description = request.json_body.get('description')
+        price = request.json_body.get('price')
+        duration = request.json_body.get('duration')
+        image_base64 = request.json_body.get('image')
 
-    service = Service.objects.create(
-        name=name, description=description, price=price, duration=duration
-    )
-    return JsonResponse({'id': service.pk})
+        if not all([name, description, price, duration]):
+            return JsonResponse(
+                {'error': 'Todos los campos son requeridos: name, description, price, duration'},
+                status=400,
+            )
+
+        duration = Service.convert_duration_string(duration)
+
+        image_file = None
+        if image_base64:
+            try:
+                format_part, data_part = image_base64.split(',')
+                file_format = format_part.split('/')[1].split(';')[0]
+
+                image_data = base64.b64decode(data_part)
+
+                filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+                image_file = ContentFile(image_data, name=filename)
+
+            except Exception as e:
+                return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
+
+        service = Service.objects.create(
+            name=name, description=description, price=price, duration=duration, image=image_file
+        )
+
+        return JsonResponse({'id': service.pk, 'msg': 'Servicio creado exitosamente'})
+
+    except Exception as e:
+        return JsonResponse({'error': f'Error al crear el servicio: {str(e)}'}, status=500)
 
 
 @csrf_exempt
@@ -131,6 +148,20 @@ def edit_service(request, service_pk: int):
     service.price = request.json_body['price']
     duration = request.json_body['duration']
     service.duration = Service.convert_duration_string(duration)
+    image_base64 = request.json_body.get('image')
+    if image_base64:
+        try:
+            format_part, data_part = image_base64.split(',')
+            file_format = format_part.split('/')[1].split(';')[0]
+
+            image_data = base64.b64decode(data_part)
+
+            filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+            image_file = ContentFile(image_data, name=filename)
+            service.image = image_file
+        except Exception as e:
+            return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
+
     service.save()
     return JsonResponse({'msg': 'El servicio ha sido editado'})
 

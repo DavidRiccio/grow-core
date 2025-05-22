@@ -1,3 +1,7 @@
+import base64
+import uuid
+
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -89,8 +93,25 @@ def add_product(request):
     description = request.json_body['description']
     price = request.json_body['price']
     stock = request.json_body['stock']
+    image_base64 = request.json_body.get('image')
 
-    product = Product.objects.create(name=name, description=description, price=price, stock=stock)
+    image_file = None
+    if image_base64:
+        try:
+            format_part, data_part = image_base64.split(',')
+            file_format = format_part.split('/')[1].split(';')[0]
+
+            image_data = base64.b64decode(data_part)
+
+            filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+            image_file = ContentFile(image_data, name=filename)
+
+        except Exception as e:
+            return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
+
+    product = Product.objects.create(
+        name=name, description=description, price=price, stock=stock, image=image_file
+    )
     return JsonResponse({'id': product.pk})
 
 
@@ -125,7 +146,20 @@ def edit_product(request, product_pk: int):
     product.description = request.json_body['description']
     product.price = request.json_body['price']
     product.stock = request.json_body['stock']
-    product.image = request.image
+    image_base64 = request.json_body.get('image')
+    if image_base64:
+        try:
+            format_part, data_part = image_base64.split(',')
+            file_format = format_part.split('/')[1].split(';')[0]
+
+            image_data = base64.b64decode(data_part)
+
+            filename = f'service_{uuid.uuid4().hex[:8]}.{file_format}'
+            image_file = ContentFile(image_data, name=filename)
+            product.image = image_file
+        except Exception as e:
+            return JsonResponse({'error': f'Error procesando la imagen: {str(e)}'}, status=400)
+
     product.save()
     return JsonResponse({'msg': 'El producto ha sido editado'})
 
