@@ -24,15 +24,22 @@ def send_booking_confirmation(user_email, service_name, date, time_slot):
         Horario reservado en formato cadena.
     """
     subject = 'Confirmación de reserva'
+
     message = f"""
-    ¡Tu reserva ha sido confirmada!
-    
-    Servicio: {service_name}
-    Fecha: {date}
-    Horario: {time_slot}
-    
-    Gracias por elegirnos.
-    """
+Estimado/a cliente,
+
+Le confirmamos que su reserva ha sido registrada correctamente con los siguientes detalles:
+
+• Servicio: {service_name}
+• Fecha: {date}
+• Horario: {time_slot}
+
+Agradecemos su confianza y quedamos a su disposición para cualquier consulta adicional.
+
+Atentamente,  
+El equipo de atención al cliente
+"""
+
     send_mail(
         subject,
         message,

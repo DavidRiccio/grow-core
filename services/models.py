@@ -75,7 +75,7 @@ class Service(models.Model):
         ValueError
             Si el formato de la cadena no es válido.
         """
-        pattern = re.compile(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?')
+        pattern = re.compile(r'P(?:\d+D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?')
         match = pattern.match(duration_str)
         if not match:
             raise ValueError('Formato de duración no válido')

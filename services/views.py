@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -65,7 +64,6 @@ def service_detail(request, service_pk):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -101,7 +99,6 @@ def add_service(request):
     return JsonResponse({'id': service.pk})
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body

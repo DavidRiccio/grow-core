@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -61,7 +60,6 @@ def event_detail(request, event_pk):
     return serializer.json_response()
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -101,7 +99,6 @@ def add_event(request):
     return JsonResponse({'id': event.pk})
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @load_json_body
@@ -138,7 +135,6 @@ def edit_event(request, event_pk: int):
     return JsonResponse({'msg': 'Event has been edited'})
 
 
-@login_required
 @csrf_exempt
 @required_method('POST')
 @verify_token
