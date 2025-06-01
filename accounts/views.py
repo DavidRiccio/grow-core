@@ -10,33 +10,73 @@ from shared.decorators import (
 )
 
 
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+
 @csrf_exempt
 @required_method('POST')
 @load_json_body
 def user_login(request):
     """
     Inicia sesión de un usuario.
-
+    
     Este endpoint permite a un usuario autenticarse proporcionando su nombre de usuario
     y contraseña. Si las credenciales son correctas, se inicia la sesión y se devuelve
     un token de autenticación.
-
+    
     Parameters
     ----------
     request : HttpRequest
         Objeto de solicitud HTTP que contiene las credenciales del usuario.
-
+    
     Returns
     -------
     JsonResponse
-        Respuesta con un mensaje de éxito y el token de autenticación.
+        Respuesta con un mensaje de éxito y el token de autenticación si las credenciales
+        son correctas, o un mensaje de error si son incorrectas.
     """
-    username = request.json_body['username']
-    password = request.json_body['password']
-    if user := authenticate(request, username=username, password=password):
-        login(request, user)
+    try:
+        username = request.json_body['username']
+        password = request.json_body['password']
+        
+        # Validar que se proporcionaron ambos campos
+        if not username or not password:
+            return JsonResponse(
+                {'error': 'Username y password son requeridos'}, 
+                status=400
+            )
+        
+        # Intentar autenticar al usuario
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            # Usuario autenticado correctamente
+            login(request, user)
+            return JsonResponse({
+                'msg': 'Usuario logeado',
+                'token': user.token.key,
+                'role': user.profile.role
+            })
+        else:
+            # Credenciales incorrectas
+            return JsonResponse(
+                {'error': 'Credenciales incorrectas. Verifica tu usuario y contraseña'}, 
+                status=401
+            )
+    
+    except KeyError as e:
+        # Campos faltantes en el JSON
         return JsonResponse(
-            {'msg': 'Usuario logeado', 'token': user.token.key, 'role': user.profile.role}
+            {'error': f'Campo requerido faltante: {str(e)}'}, 
+            status=400
+        )
+    except Exception as e:
+        # Error general del servidor
+        return JsonResponse(
+            {'error': 'Error interno del servidor'}, 
+            status=500
         )
 
 

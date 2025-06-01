@@ -2,6 +2,37 @@ from products.serializers import ProductSerializer
 from shared.serializers import BaseSerializer
 
 
+class OrderItemSerializer(BaseSerializer):
+    """
+    Serializador para el modelo OrderItem.
+    
+    Convierte instancias de OrderItem en diccionarios con información
+    detallada del producto, cantidad y precios.
+    """
+    
+    def serialize_instance(self, instance) -> dict:
+        """
+        Serializa una instancia del modelo OrderItem a un diccionario.
+
+        Parameters
+        ----------
+        instance : OrderItem
+            Instancia del modelo OrderItem.
+
+        Returns
+        -------
+        dict
+            Diccionario con los datos serializados del item.
+        """
+        return {
+            'id': instance.id,
+            'product': ProductSerializer(instance.product, request=self.request).serialize(),
+            'quantity': instance.quantity,
+            'unit_price': instance.unit_price,
+            'subtotal': instance.subtotal,
+        }
+
+
 class OrderSerializer(BaseSerializer):
     """
     Serializador para el modelo Order.
@@ -41,8 +72,8 @@ class OrderSerializer(BaseSerializer):
         """
         return {
             'id': instance.id,
-            'products': ProductSerializer(
-                instance.products.all(), request=self.request
+            'items': OrderItemSerializer(
+                instance.items.all(), request=self.request
             ).serialize(),
             'price': instance.price,
             'created_at': instance.created_at,
